@@ -15,6 +15,23 @@ PriceRadar TH คือแอปติดตามราคาสินค้า
 - ตัวติดตั้ง Windows: `v0.1.3`
 - หน้า release: `https://github.com/stoprider/priceradar/releases/tag/v0.1.3`
 
+## ภาพหน้าจอ
+หน้าแรก
+
+![PriceRadar TH หน้าแรก](./docs/screenshots/home.png)
+
+แดชบอร์ด
+
+![PriceRadar TH แดชบอร์ด](./docs/screenshots/dashboard.png)
+
+หน้าสินค้าที่ติดตาม
+
+![PriceRadar TH หน้าสินค้า](./docs/screenshots/products.png)
+
+หน้ารายการเฝ้าดู
+
+![PriceRadar TH หน้ารายการเฝ้าดู](./docs/screenshots/watchlists.png)
+
 ## จุดเด่น
 - ระบบติดตามสินค้า, watchlist, dashboard, และหน้ารายละเอียดสินค้า
 - ระบบล็อกอินด้วย signed cookie พร้อมบัญชี demo

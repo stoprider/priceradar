@@ -15,6 +15,23 @@ Current recommended version:
 - Windows installer: `v0.1.3`
 - Release page: `https://github.com/stoprider/priceradar/releases/tag/v0.1.3`
 
+## Screenshots
+Landing page
+
+![PriceRadar TH landing page](./docs/screenshots/home.png)
+
+Dashboard
+
+![PriceRadar TH dashboard](./docs/screenshots/dashboard.png)
+
+Tracked products
+
+![PriceRadar TH products page](./docs/screenshots/products.png)
+
+Watchlists
+
+![PriceRadar TH watchlists page](./docs/screenshots/watchlists.png)
+
 ## Highlights
 - Product tracking, watchlists, dashboard, and product detail pages
 - Signed cookie auth with seeded demo account
