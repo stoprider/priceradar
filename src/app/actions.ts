@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { clearSession, createSession, requireUser } from "@/server/auth";
 import { hashPassword, verifyPassword } from "@/server/password";
 import { createOrUpdateTrackedProduct, runProductCheck } from "@/server/product-service";
+import { sendTelegramAlert } from "@/server/telegram";
 
 function getString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -18,7 +19,7 @@ export async function registerAction(formData: FormData) {
   const password = getString(formData, "password");
 
   if (!name || !email || password.length < 8) {
-    redirect("/register?error=กรุณากรอกข้อมูลให้ครบและตั้งรหัสผ่านอย่างน้อย+8+ตัวอักษร");
+    redirect("/register?error=กรุณากรอกข้อมูลให้ครบและตั้งรหัสผ่านอย่างน้อย 8 ตัวอักษร");
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -110,6 +111,7 @@ export async function triggerProductCheckAction(formData: FormData) {
 export async function updateSettingsAction(formData: FormData) {
   const user = await requireUser();
   const name = getString(formData, "name");
+  const telegramBotToken = getString(formData, "telegramBotToken");
   const telegramChatId = getString(formData, "telegramChatId");
   const telegramEnabled = formData.get("telegramEnabled") === "on";
 
@@ -117,6 +119,7 @@ export async function updateSettingsAction(formData: FormData) {
     where: { id: user.id },
     data: {
       name: name || user.name,
+      telegramBotToken: telegramBotToken || null,
       telegramChatId: telegramChatId || null,
       telegramEnabled,
     },
@@ -124,6 +127,42 @@ export async function updateSettingsAction(formData: FormData) {
 
   revalidatePath("/settings");
   redirect("/settings?success=บันทึกการตั้งค่าเรียบร้อยแล้ว");
+}
+
+export async function testTelegramAction() {
+  const user = await requireUser();
+  const botToken = user.telegramBotToken || process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = user.telegramChatId || process.env.TELEGRAM_CHAT_ID;
+
+  if (!botToken || !chatId) {
+    redirect("/settings?error=กรุณาตั้งค่า Telegram bot token และ chat ID ให้ครบก่อนทดสอบ");
+  }
+
+  const response = await sendTelegramAlert({
+    title: "ทดสอบการแจ้งเตือน",
+    message: "หากคุณเห็นข้อความนี้ แปลว่าการเชื่อมต่อ Telegram ของ PriceRadar TH ใช้งานได้แล้ว",
+    url: "https://github.com/stoprider/priceradar",
+    botToken,
+    chatId,
+  });
+
+  await prisma.notificationLog.create({
+    data: {
+      userId: user.id,
+      channel: "telegram",
+      title: "ทดสอบการแจ้งเตือน",
+      body: response.reason,
+      wasSent: response.ok,
+      sentAt: response.ok ? new Date() : null,
+    },
+  });
+
+  revalidatePath("/settings");
+  redirect(
+    response.ok
+      ? "/settings?success=ส่งข้อความทดสอบ Telegram เรียบร้อยแล้ว"
+      : `/settings?error=${encodeURIComponent(`ทดสอบส่ง Telegram ไม่สำเร็จ: ${response.reason}`)}`,
+  );
 }
 
 export async function createWatchlistAction(formData: FormData) {

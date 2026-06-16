@@ -33,6 +33,7 @@ model User {
   name             String
   email            String            @unique
   passwordHash     String?
+  telegramBotToken String?
   telegramChatId   String?
   telegramEnabled  Boolean           @default(false)
   createdAt        DateTime          @default(now())

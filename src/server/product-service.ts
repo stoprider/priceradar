@@ -39,6 +39,7 @@ async function recordTelegramNotification(input: {
 async function maybeSendTelegramNotifications(input: {
   user: {
     id: string;
+    telegramBotToken: string | null;
     telegramEnabled: boolean;
     telegramChatId: string | null;
   };
@@ -70,6 +71,7 @@ async function maybeSendTelegramNotifications(input: {
       title: `ราคาลดลง: ${input.product.title}`,
       message: `ราคาล่าสุด ${input.currentPrice.toLocaleString("th-TH")} บาท ลดลงจาก ${previousPrice.toLocaleString("th-TH")} บาท (${dropAmount.toLocaleString("th-TH")} บาท)`,
       url: input.product.sourceUrl,
+      botToken: input.user.telegramBotToken,
       chatId: input.user.telegramChatId,
     });
 
@@ -86,6 +88,7 @@ async function maybeSendTelegramNotifications(input: {
       title: `ถึงราคาเป้าหมาย: ${input.product.title}`,
       message: `ราคาปัจจุบัน ${input.currentPrice.toLocaleString("th-TH")} บาท ต่ำกว่าหรือเท่ากับราคาเป้าหมาย ${targetPrice.toLocaleString("th-TH")} บาท`,
       url: input.product.sourceUrl,
+      botToken: input.user.telegramBotToken,
       chatId: input.user.telegramChatId,
     });
 
@@ -176,6 +179,7 @@ export async function runProductCheck(productId: string) {
     await maybeSendTelegramNotifications({
       user: {
         id: product.user.id,
+        telegramBotToken: product.user.telegramBotToken,
         telegramEnabled: product.user.telegramEnabled,
         telegramChatId: product.user.telegramChatId,
       },

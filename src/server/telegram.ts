@@ -2,17 +2,18 @@ type TelegramPayload = {
   title: string;
   message: string;
   url: string;
+  botToken?: string | null;
   chatId?: string | null;
 };
 
 export async function sendTelegramAlert(payload: TelegramPayload) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const token = payload.botToken || process.env.TELEGRAM_BOT_TOKEN;
   const chatId = payload.chatId || process.env.TELEGRAM_CHAT_ID;
 
   if (!token || !chatId) {
     return {
       ok: false,
-      reason: "Telegram environment variables are missing.",
+      reason: "Telegram bot token or chat ID is missing.",
     };
   }
 
@@ -30,6 +31,6 @@ export async function sendTelegramAlert(payload: TelegramPayload) {
 
   return {
     ok: response.ok,
-    reason: response.ok ? "Sent" : "Telegram API returned an error",
+    reason: response.ok ? "Sent" : `Telegram API returned an error (${response.status})`,
   };
 }
