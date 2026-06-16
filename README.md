@@ -87,6 +87,10 @@ npm run build:desktop
 ```
 
 The installer output is written to `dist-desktop/`.
+Desktop release builds now include:
+- custom app and installer icon
+- GitHub Release-based update checks from inside the app
+- `latest.yml` metadata for desktop update flows
 
 If your shell has `ELECTRON_RUN_AS_NODE=1`, launch the desktop app through:
 

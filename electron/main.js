@@ -3,6 +3,8 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const electron = require("electron");
+const { autoUpdater } = require("electron-updater");
+
 const { app, BrowserWindow, dialog, shell } = electron;
 
 const DESKTOP_PORT = 3230;
@@ -10,15 +12,19 @@ const DESKTOP_HOST = "127.0.0.1";
 const desktopLogPath = path.join(os.tmpdir(), "priceradar-desktop.log");
 
 let mainWindow = null;
+let updatePromptVisible = false;
 
 function writeLog(message) {
   const line = `[${new Date().toISOString()}] ${message}\n`;
   fs.appendFileSync(desktopLogPath, line, "utf8");
 }
 
+function showDesktopErrorBox(title, message) {
+  dialog.showErrorBox(title, message);
+}
+
 function getRootPath(...segments) {
-  const basePath = app.getAppPath();
-  return path.join(basePath, ...segments);
+  return path.join(app.getAppPath(), ...segments);
 }
 
 function getStandaloneDirectory() {
@@ -31,16 +37,12 @@ function getStandaloneDirectory() {
   return getRootPath(".next", "standalone");
 }
 
-if (!app || typeof app.whenReady !== "function") {
-  const reason =
-    "Electron runtime is unavailable. Clear ELECTRON_RUN_AS_NODE and relaunch PriceRadar TH.";
-
-  writeLog(reason);
-  throw new Error(reason);
-}
-
 function ensureDirectory(dirPath) {
   fs.mkdirSync(dirPath, { recursive: true });
+}
+
+function isDesktopReleaseBuild() {
+  return app.isPackaged && !process.env.ELECTRON_START_URL;
 }
 
 function getRuntimeDirectory() {
@@ -104,6 +106,7 @@ function startBundledServer() {
   const runtimePath = getRuntimeDirectory();
   const standaloneDir = getStandaloneDirectory();
   const serverEntry = path.join(standaloneDir, "server.js");
+
   writeLog(`Starting bundled server from ${serverEntry}`);
   writeLog(`Database path: ${databasePath}`);
   writeLog(`Runtime path: ${runtimePath}`);
@@ -123,6 +126,72 @@ function startBundledServer() {
   writeLog("Bundled server required successfully");
 }
 
+function wireAutoUpdater() {
+  if (!isDesktopReleaseBuild()) {
+    writeLog("Skipping auto-update setup for non-packaged or dev runtime");
+    return;
+  }
+
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  autoUpdater.on("checking-for-update", () => {
+    writeLog("Checking for updates");
+  });
+
+  autoUpdater.on("update-available", async (info) => {
+    writeLog(`Update available: ${info.version}`);
+
+    if (updatePromptVisible) {
+      return;
+    }
+
+    updatePromptVisible = true;
+    const result = await dialog.showMessageBox({
+      type: "info",
+      buttons: ["ดาวน์โหลดตอนนี้", "ภายหลัง"],
+      defaultId: 0,
+      cancelId: 1,
+      title: "มีอัปเดตใหม่",
+      message: `พบ PriceRadar TH เวอร์ชัน ${info.version}`,
+      detail: "ต้องการดาวน์โหลดอัปเดตตอนนี้หรือไม่",
+    });
+    updatePromptVisible = false;
+
+    if (result.response === 0) {
+      writeLog(`Downloading update ${info.version}`);
+      void autoUpdater.downloadUpdate();
+    }
+  });
+
+  autoUpdater.on("update-not-available", () => {
+    writeLog("No updates available");
+  });
+
+  autoUpdater.on("error", (error) => {
+    const message = error instanceof Error ? error.message : String(error);
+    writeLog(`Auto-update error: ${message}`);
+  });
+
+  autoUpdater.on("update-downloaded", async (info) => {
+    writeLog(`Update downloaded: ${info.version}`);
+
+    const result = await dialog.showMessageBox({
+      type: "info",
+      buttons: ["ติดตั้งและเปิดใหม่", "ภายหลัง"],
+      defaultId: 0,
+      cancelId: 1,
+      title: "พร้อมติดตั้งอัปเดต",
+      message: `ดาวน์โหลด PriceRadar TH เวอร์ชัน ${info.version} เรียบร้อยแล้ว`,
+      detail: "สามารถติดตั้งและเปิดแอปใหม่ได้ทันที",
+    });
+
+    if (result.response === 0) {
+      autoUpdater.quitAndInstall();
+    }
+  });
+}
+
 async function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1440,
@@ -131,6 +200,7 @@ async function createWindow() {
     minHeight: 760,
     title: "PriceRadar TH",
     autoHideMenuBar: true,
+    icon: getRootPath("src", "app", "favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
@@ -156,14 +226,27 @@ async function createWindow() {
   await mainWindow.loadURL(appUrl);
 }
 
+if (!app || typeof app.whenReady !== "function") {
+  const reason =
+    "Electron runtime is unavailable. Clear ELECTRON_RUN_AS_NODE and relaunch PriceRadar TH.";
+
+  writeLog(reason);
+  throw new Error(reason);
+}
+
 app.whenReady().then(async () => {
   try {
     writeLog("Electron app is ready");
+    wireAutoUpdater();
     await createWindow();
+
+    if (isDesktopReleaseBuild()) {
+      void autoUpdater.checkForUpdates();
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown desktop startup error";
     writeLog(`Startup failure: ${message}`);
-    dialog.showErrorBox("PriceRadar TH เริ่มระบบไม่สำเร็จ", message);
+    showDesktopErrorBox("PriceRadar TH เริ่มระบบไม่สำเร็จ", message);
     app.quit();
   }
 });

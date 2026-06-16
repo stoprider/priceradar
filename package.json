@@ -1,6 +1,6 @@
 {
   "name": "priceradar-th",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "Thai-first desktop and web price tracker for Thailand e-commerce",
   "author": "stoprider",
@@ -26,6 +26,13 @@
     "directories": {
       "output": "dist-desktop"
     },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "stoprider",
+        "repo": "priceradar"
+      }
+    ],
     "files": [
       "electron/**/*",
       "desktop/bundle/**/*",
@@ -33,6 +40,7 @@
       "package.json"
     ],
     "win": {
+      "icon": "src/app/favicon.ico",
       "target": [
         {
           "target": "nsis",
@@ -46,7 +54,11 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
+      "createStartMenuShortcut": true,
+      "installerIcon": "src/app/favicon.ico",
+      "uninstallerIcon": "src/app/favicon.ico",
+      "installerHeaderIcon": "src/app/favicon.ico",
+      "artifactName": "PriceRadar TH Setup ${version}.${ext}"
     }
   },
   "dependencies": {
@@ -60,6 +72,7 @@
     "lucide-react": "^1.17.0",
     "next": "16.2.9",
     "next-auth": "^4.24.14",
+    "electron-updater": "^6.6.2",
     "node-cron": "^4.2.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
