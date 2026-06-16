@@ -13,7 +13,7 @@ export default function HomePage() {
           <div>
             <div className="text-sm uppercase tracking-[0.24em] text-[color:var(--color-ink-soft)]">PriceRadar TH</div>
             <h1 className="mt-3 max-w-3xl text-5xl font-semibold leading-[1.02] tracking-[-0.06em] text-[color:var(--color-ink)]">
-              ระบบติดตามราคาสำหรับคนไทย ที่ให้ประสบการณ์เหมือนโปรดักต์จริง ไม่ใช่แค่เทมเพลต
+              ระบบติดตามราคาสำหรับคนไทย ที่ให้ประสบการณ์เหมือนโปรดักชันจริง ไม่ใช่แค่เทมเพลต
             </h1>
           </div>
           <div className="flex gap-3">
@@ -35,8 +35,8 @@ export default function HomePage() {
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               {[
                 "วางลิงก์สินค้าจาก HomePro, Power Buy, Advice หรือ JIB",
-                "ดึงข้อมูลสินค้าและราคาจากหน้าเว็บที่รองรับ",
-                "บันทึกสแน็ปราคาและประวัติย้อนหลัง 30 วัน",
+                "ดึงข้อมูลสินค้าและราคาจากหน้าร้านที่รองรับ",
+                "บันทึกสแนปราคาและประวัติย้อนหลัง 30 วัน",
                 "คำนวณความคุ้มค่าและเตรียมแจ้งเตือนผ่าน Telegram",
               ].map((item) => (
                 <div key={item} className="rounded-[1.5rem] bg-[color:var(--color-surface-alt)] p-5 text-sm leading-6 text-[color:var(--color-ink-muted)]">

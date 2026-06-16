@@ -12,8 +12,8 @@ PriceRadar TH คือแอปติดตามราคาสินค้า
 ดาวน์โหลด desktop build ล่าสุดได้จากหน้า [Releases](https://github.com/stoprider/priceradar/releases)
 
 เวอร์ชันที่แนะนำตอนนี้:
-- ตัวติดตั้ง Windows: `v0.1.3`
-- หน้า release: `https://github.com/stoprider/priceradar/releases/tag/v0.1.3`
+- ตัวติดตั้ง Windows: `v0.1.4`
+- หน้า release: `https://github.com/stoprider/priceradar/releases/tag/v0.1.4`
 
 ## ภาพหน้าจอ
 หน้าแรก

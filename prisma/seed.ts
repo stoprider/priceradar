@@ -9,11 +9,12 @@ async function main() {
   const user = await prisma.user.upsert({
     where: { email: "demo@priceradar.th" },
     update: {
+      name: "ผู้ใช้เดโม",
       passwordHash,
       telegramEnabled: false,
     },
     create: {
-      name: "Demo User",
+      name: "ผู้ใช้เดโม",
       email: "demo@priceradar.th",
       passwordHash,
       telegramChatId: "123456789",
@@ -50,7 +51,7 @@ async function main() {
       targetPrice: 8500,
       status: "IN_STOCK",
       confidenceLevel: "HIGH",
-      confidenceReason: "Structured price block detected",
+      confidenceReason: "ตรวจพบบล็อกราคาหลักของสินค้าอย่างชัดเจน",
       dealScoreBand: "GOOD_DEAL",
       dealScoreValue: 78,
       lowest30d: 8590,
@@ -86,11 +87,15 @@ async function main() {
 
   const watchlist = await prisma.watchlist.upsert({
     where: { publicId: "battle-station-upgrades" },
-    update: {},
+    update: {
+      name: "อัปเกรดโต๊ะทำงาน",
+      description: "รวมจอ SSD และอุปกรณ์เครือข่ายสำหรับรอบอัปเกรดครั้งถัดไป",
+      isPublic: true,
+    },
     create: {
       userId: user.id,
-      name: "Battle Station Upgrades",
-      description: "Monitor, SSD, and networking gear for the next desk refresh.",
+      name: "อัปเกรดโต๊ะทำงาน",
+      description: "รวมจอ SSD และอุปกรณ์เครือข่ายสำหรับรอบอัปเกรดครั้งถัดไป",
       publicId: "battle-station-upgrades",
       isPublic: true,
     },
@@ -103,11 +108,13 @@ async function main() {
         productId: monitor.id,
       },
     },
-    update: {},
+    update: {
+      note: "อัปเกรดลำดับต้นของไตรมาสนี้",
+    },
     create: {
       watchlistId: watchlist.id,
       productId: monitor.id,
-      note: "Priority upgrade for Q3",
+      note: "อัปเกรดลำดับต้นของไตรมาสนี้",
     },
   });
 
@@ -117,7 +124,7 @@ async function main() {
         storeId: stores[1].id,
         productUrl: monitor.sourceUrl,
         success: true,
-        message: "Seeded scrape log",
+        message: "บันทึก log ตัวอย่างจาก seed",
         scrapedPrice: 8990,
         responseTimeMs: 900,
       },

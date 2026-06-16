@@ -15,7 +15,7 @@ export default async function DashboardPage() {
     <AppShell
       user={user}
       title="แดชบอร์ด"
-      description="ติดตามราคาสินค้าจากร้านค้าที่รองรับ ดูจังหวะซื้อที่น่าสนใจ และอ่านข้อมูลสำคัญได้อย่างรวดเร็วในหน้าเดียว"
+      description="ติดตามราคาสินค้าจากร้านที่รองรับ ดูจังหวะซื้อที่น่าสนใจ และอ่านข้อมูลสำคัญได้อย่างรวดเร็วในหน้าเดียว"
     >
       <div className="grid gap-4 xl:grid-cols-4">
         <MetricCard label="สินค้าที่ติดตาม" value={String(data.summary.tracked)} delta="ข้อมูลจากฐานข้อมูลจริง" />
