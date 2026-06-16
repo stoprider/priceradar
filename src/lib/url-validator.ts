@@ -9,7 +9,7 @@ export function validateStoreUrl(input: string) {
       return {
         isValid: false,
         host: url.hostname,
-        message: "Store not recognized yet",
+        message: "ยังไม่รองรับลิงก์ร้านค้านี้",
       };
     }
 
@@ -17,20 +17,20 @@ export function validateStoreUrl(input: string) {
       return {
         isValid: false,
         host: url.hostname,
-        message: store.supportNotes || "Store recognized but not enabled yet",
+        message: store.supportNotes || `ระบบยังไม่เปิดใช้งาน ${store.name}`,
       };
     }
 
     return {
       isValid: true,
       host: url.hostname,
-      message: `Supported store URL (${store.name})`,
+      message: `รองรับลิงก์ ${store.name}`,
     };
   } catch {
     return {
       isValid: false,
       host: "",
-      message: "Invalid URL format",
+      message: "รูปแบบลิงก์ไม่ถูกต้อง",
     };
   }
 }

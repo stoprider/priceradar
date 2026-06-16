@@ -28,6 +28,9 @@ async function main() {
       { key: "powerbuy", name: "Power Buy", baseUrl: "https://www.powerbuy.co.th" },
       { key: "advice", name: "Advice", baseUrl: "https://www.advice.co.th" },
       { key: "jib", name: "JIB", baseUrl: "https://www.jib.co.th" },
+      { key: "shopee", name: "Shopee", baseUrl: "https://shopee.co.th" },
+      { key: "lazada", name: "Lazada", baseUrl: "https://www.lazada.co.th" },
+      { key: "temu", name: "Temu", baseUrl: "https://www.temu.com" },
     ].map((store) =>
       prisma.store.upsert({
         where: { key: store.key },
@@ -51,7 +54,7 @@ async function main() {
       targetPrice: 8500,
       status: "IN_STOCK",
       confidenceLevel: "HIGH",
-      confidenceReason: "ตรวจพบบล็อกราคาหลักของสินค้าอย่างชัดเจน",
+      confidenceReason: "ตรวจพบบล็อกราคาหลักของสินค้าที่หน้าเว็บโดยตรง",
       dealScoreBand: "GOOD_DEAL",
       dealScoreValue: 78,
       lowest30d: 8590,

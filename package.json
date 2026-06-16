@@ -1,6 +1,6 @@
 {
   "name": "priceradar-th",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "private": true,
   "description": "Thai-first desktop and web price tracker for Thailand e-commerce",
   "author": "stoprider",
@@ -36,6 +36,15 @@
         "repo": "priceradar"
       }
     ],
+    "extraResources": [
+      {
+        "from": "desktop/launcher",
+        "to": ".",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
     "files": [
       "electron/**/*",
       "desktop/bundle/**/*",
@@ -60,6 +69,7 @@
       "createStartMenuShortcut": true,
       "shortcutName": "PriceRadar TH",
       "deleteAppDataOnUninstall": false,
+      "include": "build/installer.nsh",
       "installerIcon": "src/app/favicon.ico",
       "uninstallerIcon": "src/app/favicon.ico",
       "installerHeaderIcon": "src/app/favicon.ico",

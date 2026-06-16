@@ -3,7 +3,6 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const electron = require("electron");
-const { autoUpdater } = require("electron-updater");
 
 const { app, BrowserWindow, dialog, shell } = electron;
 
@@ -15,12 +14,25 @@ const desktopLogPath = path.join(os.tmpdir(), "priceradar-desktop.log");
 
 let mainWindow = null;
 let updatePromptVisible = false;
-let updateChannel = "stable";
+let updateChannel = "latest";
+let autoUpdaterInstance = null;
 
 function writeLog(message) {
   const line = `[${new Date().toISOString()}] ${message}\n`;
   fs.appendFileSync(desktopLogPath, line, "utf8");
 }
+
+writeLog("Bootstrapping desktop main process");
+
+process.on("uncaughtException", (error) => {
+  const message = error instanceof Error ? `${error.message}\n${error.stack || ""}` : String(error);
+  writeLog(`Uncaught exception: ${message}`);
+});
+
+process.on("unhandledRejection", (reason) => {
+  const message = reason instanceof Error ? `${reason.message}\n${reason.stack || ""}` : String(reason);
+  writeLog(`Unhandled rejection: ${message}`);
+});
 
 function showDesktopErrorBox(title, message) {
   dialog.showErrorBox(title, message);
@@ -93,11 +105,25 @@ function resolveUpdateChannel() {
     return "beta";
   }
 
-  if (forcedChannel === "stable") {
-    return "stable";
+  if (forcedChannel === "stable" || forcedChannel === "latest") {
+    return "latest";
   }
 
-  return app.getVersion().includes("-beta") ? "beta" : "stable";
+  return app.getVersion().includes("-beta") ? "beta" : "latest";
+}
+
+function getUpdateChannelLabel(channel) {
+  return channel === "latest" ? "stable" : channel;
+}
+
+function getAutoUpdater() {
+  if (autoUpdaterInstance) {
+    return autoUpdaterInstance;
+  }
+
+  const { autoUpdater } = require("electron-updater");
+  autoUpdaterInstance = autoUpdater;
+  return autoUpdaterInstance;
 }
 
 async function waitForServer(url, timeoutMs = 30000) {
@@ -156,7 +182,7 @@ function setProgressState(progress) {
 
   const bounded = Math.max(0, Math.min(progress, 1));
   mainWindow.setProgressBar(bounded);
-  mainWindow.setTitle(`${APP_TITLE} • กำลังดาวน์โหลดอัปเดต ${Math.round(bounded * 100)}%`);
+  mainWindow.setTitle(`${APP_TITLE} - กำลังดาวน์โหลดอัปเดต ${Math.round(bounded * 100)}%`);
 }
 
 function wireAutoUpdater() {
@@ -165,17 +191,18 @@ function wireAutoUpdater() {
     return;
   }
 
+  const updater = getAutoUpdater();
   updateChannel = resolveUpdateChannel();
-  autoUpdater.channel = updateChannel;
-  autoUpdater.allowPrerelease = updateChannel === "beta";
-  autoUpdater.autoDownload = false;
-  autoUpdater.autoInstallOnAppQuit = true;
+  updater.channel = updateChannel;
+  updater.allowPrerelease = updateChannel === "beta";
+  updater.autoDownload = false;
+  updater.autoInstallOnAppQuit = true;
 
-  autoUpdater.on("checking-for-update", () => {
-    writeLog(`Checking for updates on ${updateChannel} channel`);
+  updater.on("checking-for-update", () => {
+    writeLog(`Checking for updates on ${getUpdateChannelLabel(updateChannel)} channel`);
   });
 
-  autoUpdater.on("update-available", async (info) => {
+  updater.on("update-available", async (info) => {
     writeLog(`Update available: ${info.version}`);
 
     if (updatePromptVisible) {
@@ -190,34 +217,34 @@ function wireAutoUpdater() {
       cancelId: 1,
       title: "มีอัปเดตใหม่",
       message: `พบ ${APP_TITLE} เวอร์ชัน ${info.version}`,
-      detail: `ช่องทางอัปเดตปัจจุบัน: ${updateChannel}\nต้องการดาวน์โหลดตอนนี้หรือไม่`,
+      detail: `ช่องทางอัปเดตปัจจุบัน: ${getUpdateChannelLabel(updateChannel)}\nต้องการดาวน์โหลดตอนนี้หรือไม่`,
     });
     updatePromptVisible = false;
 
     if (result.response === 0) {
       writeLog(`Downloading update ${info.version}`);
       setProgressState(0);
-      void autoUpdater.downloadUpdate();
+      void updater.downloadUpdate();
     }
   });
 
-  autoUpdater.on("download-progress", (progress) => {
+  updater.on("download-progress", (progress) => {
     const fraction = (progress.percent ?? 0) / 100;
     writeLog(`Update download progress: ${progress.percent?.toFixed?.(1) ?? progress.percent}%`);
     setProgressState(fraction);
   });
 
-  autoUpdater.on("update-not-available", () => {
+  updater.on("update-not-available", () => {
     writeLog("No updates available");
   });
 
-  autoUpdater.on("error", (error) => {
+  updater.on("error", (error) => {
     const message = error instanceof Error ? error.message : String(error);
     writeLog(`Auto-update error: ${message}`);
     setProgressState(null);
   });
 
-  autoUpdater.on("update-downloaded", async (info) => {
+  updater.on("update-downloaded", async (info) => {
     writeLog(`Update downloaded: ${info.version}`);
     setProgressState(null);
 
@@ -232,7 +259,7 @@ function wireAutoUpdater() {
     });
 
     if (result.response === 0) {
-      autoUpdater.quitAndInstall();
+      updater.quitAndInstall();
     }
   });
 }
@@ -291,9 +318,10 @@ app.whenReady().then(async () => {
     await createWindow();
 
     if (isDesktopReleaseBuild()) {
-      void autoUpdater.checkForUpdates();
+      const updater = getAutoUpdater();
+      void updater.checkForUpdates();
       setInterval(() => {
-        void autoUpdater.checkForUpdates();
+        void updater.checkForUpdates();
       }, UPDATE_CHECK_INTERVAL_MS);
     }
   } catch (error) {

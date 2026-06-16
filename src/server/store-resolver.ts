@@ -12,6 +12,8 @@ export type StoreConfig = {
     image: readonly string[];
     price: readonly string[];
   };
+  blockDetectors?: readonly string[];
+  unavailableDetectors?: readonly string[];
   supportNotes?: string;
 };
 
@@ -74,8 +76,20 @@ export const STORE_CONFIG: readonly StoreConfig[] = [
     domains: ["shopee.co.th"],
     category: "marketplace",
     isEnabled: false,
-    scraperEngine: "browser-html",
-    supportNotes: "ต้องใช้ browser scraper, anti-bot handling, และ parser เฉพาะ marketplace ก่อนเปิดใช้งานจริง",
+    scraperEngine: "http-html",
+    selectors: {
+      title: ["meta[property='og:title']", "title", "h1"],
+      image: ["meta[property='og:image']", "img[alt][src]"],
+      price: [
+        "meta[property='product:price:amount']",
+        "[data-testid*='price']",
+        "[class*='price']",
+        "[class*='Price']",
+      ],
+    },
+    unavailableDetectors: ["ไม่พบรายการสินค้านี้", "ขออภัยค่ะ! ไม่พบรายการสินค้าชินนี้", "item not found"],
+    supportNotes:
+      "ระบบรู้จักลิงก์ Shopee แล้ว แต่หน้าเว็บปัจจุบันไม่ปล่อยชื่อและราคาสินค้าใน HTML ปกติอย่างเสถียร และ endpoint สินค้าตอบกลับแบบป้องกันการดึงอัตโนมัติ จึงยังไม่เปิดใช้งานใน production",
   },
   {
     key: "lazada",
@@ -83,8 +97,20 @@ export const STORE_CONFIG: readonly StoreConfig[] = [
     domains: ["lazada.co.th"],
     category: "marketplace",
     isEnabled: false,
-    scraperEngine: "browser-html",
-    supportNotes: "ต้องใช้ browser scraper หรือ API/state parser และทดสอบกับหลายรูปแบบสินค้า",
+    scraperEngine: "http-html",
+    selectors: {
+      title: ["meta[property='og:title']", "title", "h1"],
+      image: ["meta[property='og:image']", "img[alt][src]"],
+      price: [
+        "meta[property='product:price:amount']",
+        "[class*='price']",
+        "[class*='Price']",
+        "[data-price]",
+      ],
+    },
+    unavailableDetectors: ["ไม่พบรายการสินค้าชินนี้", "ขออภัยค่ะ! ไม่พบรายการสินค้าชินนี้", "404", "not found"],
+    supportNotes:
+      "ระบบรู้จักลิงก์ Lazada แล้ว แต่หน้าสินค้าจริงหลายลิงก์ตอบกลับหน้าไม่พร้อมใช้งานหรือฝังข้อมูลราคาแบบไม่เสถียร จึงยังไม่เปิดใช้งานใน production",
   },
   {
     key: "temu",
@@ -93,7 +119,9 @@ export const STORE_CONFIG: readonly StoreConfig[] = [
     category: "marketplace",
     isEnabled: false,
     scraperEngine: "browser-html",
-    supportNotes: "ต้องเพิ่ม browser-based extraction และผ่านการทดสอบ anti-bot ก่อนเปิดใช้งาน",
+    blockDetectors: ["verify you are human", "captcha", "challenge", "access denied", "security check"],
+    supportNotes:
+      "Temu ยังไม่เปิดใช้งาน เพราะหน้าเว็บต้นทางยังตอบกลับ anti-bot หรือ challenge กับการดึงข้อมูลอัตโนมัติ ต้องมี extractor เฉพาะและทดสอบจริงเพิ่มอีกชั้น",
   },
 ] as const;
 

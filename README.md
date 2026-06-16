@@ -12,8 +12,8 @@ PriceRadar TH is a Thai-first price tracking app for Thailand e-commerce, with w
 Latest desktop builds are available on the [Releases page](https://github.com/stoprider/priceradar/releases).
 
 Current recommended version:
-- Windows installer: `v0.1.6`
-- Release page: `https://github.com/stoprider/priceradar/releases/tag/v0.1.6`
+- Windows installer: `v0.1.7`
+- Release page: `https://github.com/stoprider/priceradar/releases/tag/v0.1.7`
 
 ## Screenshots
 Landing page
@@ -40,7 +40,7 @@ Watchlists
 - Windows installer build pipeline with Electron
 - Telegram alerts for target price and real price drops
 - In-app Telegram settings with bot token, chat ID, delivery status, and test send
-- Marketplace-ready scraper architecture for future Shopee, Lazada, and Temu adapters
+- Marketplace detection and readiness notes for Shopee, Lazada, and Temu, with production-safe blocking when upstream anti-bot or incomplete HTML prevents reliable scraping
 
 ## Stack
 - Next.js 16 + TypeScript
@@ -116,7 +116,7 @@ Desktop release builds include:
 - GitHub Release-based update checks
 - `latest.yml` metadata for desktop updates
 
-If your shell has `ELECTRON_RUN_AS_NODE=1`, use:
+If your environment has `ELECTRON_RUN_AS_NODE=1`, the installed Windows shortcuts now launch through a bundled launcher that clears it automatically. For local development, you can still use:
 
 ```bash
 npm run desktop:dev
@@ -127,7 +127,7 @@ Real distribution settings are documented in `.env.release.example`.
 
 Common release variables:
 - `GH_TOKEN`
-- `PR_UPDATE_CHANNEL=stable` or `beta`
+- `PR_UPDATE_CHANNEL=latest` or `beta`
 - `CSC_LINK`
 - `CSC_KEY_PASSWORD`
 
@@ -146,3 +146,4 @@ Endpoints:
 - Production deployment still needs a strong `SESSION_SECRET`.
 - Telegram alerts require valid Telegram credentials.
 - Live scraping selectors may need maintenance when retailer markup changes.
+- Shopee, Lazada, and Temu are recognized in the app, but remain blocked for production tracking until their upstream pages expose stable data paths again.
