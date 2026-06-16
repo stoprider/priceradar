@@ -1,6 +1,15 @@
 # PriceRadar TH
 
-Thai-first price tracking, comparison, deal scoring, watchlists, and Telegram alert scaffold for Thailand e-commerce.
+[ภาษาไทย](./README.th.md)
+
+PriceRadar TH is a Thai-first price tracking app for Thailand e-commerce, with web and Windows desktop distribution.
+
+## Highlights
+- Product tracking, watchlists, dashboard, and product detail pages
+- Signed cookie auth with seeded demo account
+- SQLite-backed desktop runtime for Windows
+- GitHub Release-based desktop update flow
+- Windows installer build pipeline with Electron
 
 ## Stack
 - Next.js 16 + TypeScript
@@ -8,103 +17,58 @@ Thai-first price tracking, comparison, deal scoring, watchlists, and Telegram al
 - Prisma + SQLite
 - Recharts
 - Playwright
-- node-cron
-- NextAuth-ready foundation
+- Electron + electron-builder
 
-## Included In This Scaffold
-- Premium landing page and dashboard
-- `/login`, `/register`, `/dashboard`
-- `/products`, `/products/new`, `/products/[id]`
-- `/watchlists`, `/watchlists/[id]`
-- `/share/watchlist/[publicId]`
-- `/settings`, `/admin/logs`
-- Reusable UI primitives and product-specific components
-- Mock scraper, deal score logic, confidence logic
-- Telegram notification service scaffold
-- Prisma schema, seed file, and `.env.example`
-- Real credential auth with signed cookie sessions
-- Database-backed dashboard, products, watchlists, settings, and scrape logs
-
-## Run In VS Code
-1. Install dependencies:
+## Local Development
+1. Install dependencies
 
 ```bash
 npm install
 ```
 
-2. Create your environment file:
+2. Create your environment file
 
 ```bash
 copy .env.example .env
 ```
 
-3. Generate Prisma client:
+3. Prepare the database
 
 ```bash
 npm run db:generate
-```
-
-4. Push the schema:
-
-```bash
 npm run db:push
-```
-
-5. Seed demo data:
-
-```bash
 npm run db:seed
 ```
 
-Demo login after seed:
+Demo account:
 
 ```text
 email: demo@priceradar.th
 password: demo12345
 ```
 
-6. Run the app:
+4. Start the web app
 
 ```bash
 npm run dev
 ```
 
-7. Open `http://localhost:3000`
+Open `http://localhost:3000`
 
 ## Useful Commands
 ```bash
 npm run lint
 npm run prices:check
 npm run desktop:dev
+npm run assets:icons
 npm run build:desktop
 npm run build:desktop:beta
 ```
 
-## Windows Installer
-Build a Windows installer with the bundled desktop runtime:
+## Windows Desktop Build
+Build a Windows installer:
 
 ```bash
-npm run build:desktop
-```
-
-The installer output is written to `dist-desktop/`.
-Desktop release builds now include:
-- custom app and installer icon
-- GitHub Release-based update checks from inside the app
-- `latest.yml` metadata for desktop update flows
-
-## Desktop Release Ops
-Environment variables for real distribution are documented in `.env.release.example`.
-
-For production desktop releases, set:
-- `GH_TOKEN` for GitHub Release publish and update metadata
-- `PR_UPDATE_CHANNEL=stable` or `beta`
-- `CSC_LINK` and `CSC_KEY_PASSWORD` for Windows code signing
-
-Typical flow:
-
-```bash
-npm run assets:icons
 npm run build:desktop
 ```
 
@@ -114,28 +78,40 @@ Beta channel build:
 npm run build:desktop:beta
 ```
 
-If your shell has `ELECTRON_RUN_AS_NODE=1`, launch the desktop app through:
+Output is written to `dist-desktop/`.
+
+Desktop release builds include:
+- branded app and installer icon
+- GitHub Release-based update checks
+- `latest.yml` metadata for desktop updates
+
+If your shell has `ELECTRON_RUN_AS_NODE=1`, use:
 
 ```bash
 npm run desktop:dev
 ```
 
-That helper clears the conflicting environment flag before starting Electron.
+## Release Environment
+Real distribution settings are documented in `.env.release.example`.
+
+Common release variables:
+- `GH_TOKEN`
+- `PR_UPDATE_CHANNEL=stable` or `beta`
+- `CSC_LINK`
+- `CSC_KEY_PASSWORD`
 
 ## Docker
-Run the full app stack with SQLite-backed app container:
+Run the app with Docker:
 
 ```bash
 docker compose up --build
 ```
 
-The containerized app exposes:
+Endpoints:
 - app: `http://localhost:3000`
 - health: `http://localhost:3000/api/health`
 
-For non-demo environments, replace the default secrets in `docker-compose.yml` or pass them from a real secret store.
-
 ## Notes
-- The app now uses live server-side persistence and signed cookie auth. Production deployment still requires a strong `SESSION_SECRET` and valid Telegram bot credentials if you enable alerts.
-- Scraping is implemented with a live HTML fetch + parsing pipeline for supported stores. Retailer markup can change over time, so selector maintenance is part of ongoing operations.
-- Run `npm run prices:check` from cron or your job runner to refresh tracked products outside the web request path.
+- Production deployment still needs a strong `SESSION_SECRET`.
+- Telegram alerts require valid Telegram credentials.
+- Live scraping selectors may need maintenance when retailer markup changes.
