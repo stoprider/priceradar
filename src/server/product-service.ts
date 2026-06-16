@@ -18,6 +18,86 @@ function toNumber(value: Prisma.Decimal | number | null | undefined) {
   return Number(value);
 }
 
+async function recordTelegramNotification(input: {
+  userId: string;
+  title: string;
+  body: string;
+  wasSent: boolean;
+}) {
+  await prisma.notificationLog.create({
+    data: {
+      userId: input.userId,
+      channel: "telegram",
+      title: input.title,
+      body: input.body,
+      wasSent: input.wasSent,
+      sentAt: input.wasSent ? new Date() : null,
+    },
+  });
+}
+
+async function maybeSendTelegramNotifications(input: {
+  user: {
+    id: string;
+    telegramEnabled: boolean;
+    telegramChatId: string | null;
+  };
+  product: {
+    id: string;
+    title: string;
+    sourceUrl: string;
+    targetPrice: Prisma.Decimal | number | null;
+  };
+  previousPrice: number | null;
+  currentPrice: number;
+}) {
+  if (!input.user.telegramEnabled) {
+    return;
+  }
+
+  const targetPrice = toNumber(input.product.targetPrice);
+  const priceDropped = input.previousPrice != null && input.currentPrice < input.previousPrice;
+  const targetReached = targetPrice != null && input.currentPrice <= targetPrice;
+
+  if (!priceDropped && !targetReached) {
+    return;
+  }
+
+  if (priceDropped) {
+    const previousPrice = input.previousPrice as number;
+    const dropAmount = previousPrice - input.currentPrice;
+    const response = await sendTelegramAlert({
+      title: `ราคาลดลง: ${input.product.title}`,
+      message: `ราคาล่าสุด ${input.currentPrice.toLocaleString("th-TH")} บาท ลดลงจาก ${previousPrice.toLocaleString("th-TH")} บาท (${dropAmount.toLocaleString("th-TH")} บาท)`,
+      url: input.product.sourceUrl,
+      chatId: input.user.telegramChatId,
+    });
+
+    await recordTelegramNotification({
+      userId: input.user.id,
+      title: `ราคาลดลง: ${input.product.title}`,
+      body: response.reason,
+      wasSent: response.ok,
+    });
+  }
+
+  if (targetReached) {
+    const response = await sendTelegramAlert({
+      title: `ถึงราคาเป้าหมาย: ${input.product.title}`,
+      message: `ราคาปัจจุบัน ${input.currentPrice.toLocaleString("th-TH")} บาท ต่ำกว่าหรือเท่ากับราคาเป้าหมาย ${targetPrice.toLocaleString("th-TH")} บาท`,
+      url: input.product.sourceUrl,
+      chatId: input.user.telegramChatId,
+    });
+
+    await recordTelegramNotification({
+      userId: input.user.id,
+      title: `ถึงราคาเป้าหมาย: ${input.product.title}`,
+      body: response.reason,
+      wasSent: response.ok,
+    });
+  }
+}
+
 export async function runProductCheck(productId: string) {
   const product = await prisma.product.findUnique({
     where: { id: productId },
@@ -38,6 +118,7 @@ export async function runProductCheck(productId: string) {
       take: 30,
     });
 
+    const previousPrice = historyRows[0] ? Number(historyRows[0].price) : null;
     const prices = [scraped.currentPrice, ...historyRows.map((row) => Number(row.price))];
     const average30d = prices.reduce((sum, value) => sum + value, 0) / prices.length;
     const lowest30d = Math.min(...prices);
@@ -92,28 +173,21 @@ export async function runProductCheck(productId: string) {
       },
     });
 
-    const targetPrice = toNumber(updated.targetPrice);
-    const shouldNotify = targetPrice != null && scraped.currentPrice <= targetPrice;
-
-    if (shouldNotify && product.user.telegramEnabled) {
-      const response = await sendTelegramAlert({
-        title: `Target reached: ${updated.title}`,
-        message: `Current price ${scraped.currentPrice.toLocaleString("th-TH")} THB is now at or below target ${targetPrice.toLocaleString("th-TH")} THB.`,
-        url: updated.sourceUrl,
-        chatId: product.user.telegramChatId,
-      });
-
-      await prisma.notificationLog.create({
-        data: {
-          userId: updated.userId,
-          channel: "telegram",
-          title: `Target reached: ${updated.title}`,
-          body: response.reason,
-          wasSent: response.ok,
-          sentAt: response.ok ? new Date() : null,
-        },
-      });
-    }
+    await maybeSendTelegramNotifications({
+      user: {
+        id: product.user.id,
+        telegramEnabled: product.user.telegramEnabled,
+        telegramChatId: product.user.telegramChatId,
+      },
+      product: {
+        id: updated.id,
+        title: updated.title,
+        sourceUrl: updated.sourceUrl,
+        targetPrice: updated.targetPrice,
+      },
+      previousPrice,
+      currentPrice: scraped.currentPrice,
+    });
 
     return updated;
   } catch (error) {

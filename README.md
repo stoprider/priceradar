@@ -12,8 +12,8 @@ PriceRadar TH is a Thai-first price tracking app for Thailand e-commerce, with w
 Latest desktop builds are available on the [Releases page](https://github.com/stoprider/priceradar/releases).
 
 Current recommended version:
-- Windows installer: `v0.1.4`
-- Release page: `https://github.com/stoprider/priceradar/releases/tag/v0.1.4`
+- Windows installer: `v0.1.5`
+- Release page: `https://github.com/stoprider/priceradar/releases/tag/v0.1.5`
 
 ## Screenshots
 Landing page
@@ -38,6 +38,8 @@ Watchlists
 - SQLite-backed desktop runtime for Windows
 - GitHub Release-based desktop update flow
 - Windows installer build pipeline with Electron
+- Telegram alerts for target price and real price drops
+- Marketplace-ready scraper architecture for future Shopee, Lazada, and Temu adapters
 
 ## Stack
 - Next.js 16 + TypeScript

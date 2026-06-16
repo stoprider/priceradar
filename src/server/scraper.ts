@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { resolveStoreByUrl } from "@/server/store-resolver";
+import { resolveStoreByUrl, type StoreConfig } from "@/server/store-resolver";
 
 export type ScrapeResult = {
   title: string;
@@ -10,6 +10,8 @@ export type ScrapeResult = {
   confidenceReason: string;
   rawPayload: string;
 };
+
+type ScraperAdapter = (input: { productUrl: string; store: StoreConfig }) => Promise<ScrapeResult>;
 
 function readFirstContent($: cheerio.CheerioAPI, selectors: readonly string[]) {
   for (const selector of selectors) {
@@ -73,13 +75,7 @@ function extractJsonLdPrice($: cheerio.CheerioAPI) {
   return null;
 }
 
-export async function scrapeProductUrl(productUrl: string): Promise<ScrapeResult> {
-  const store = resolveStoreByUrl(productUrl);
-
-  if (!store) {
-    throw new Error("ลิงก์ร้านค้านี้ยังไม่รองรับ");
-  }
-
+async function fetchDocument(productUrl: string) {
   const response = await fetch(productUrl, {
     headers: {
       "user-agent":
@@ -94,7 +90,15 @@ export async function scrapeProductUrl(productUrl: string): Promise<ScrapeResult
   }
 
   const html = await response.text();
-  const $ = cheerio.load(html);
+  return { response, html, $: cheerio.load(html) };
+}
+
+const httpHtmlScraper: ScraperAdapter = async ({ productUrl, store }) => {
+  if (!store.selectors) {
+    throw new Error(`Store ${store.name} is missing selector configuration`);
+  }
+
+  const { response, html, $ } = await fetchDocument(productUrl);
   const title = readFirstContent($, store.selectors.title) || $("title").text().trim();
   const imageUrl = readFirstContent($, store.selectors.image);
 
@@ -134,6 +138,8 @@ export async function scrapeProductUrl(productUrl: string): Promise<ScrapeResult
     confidenceLevel,
     confidenceReason,
     rawPayload: JSON.stringify({
+      scraperEngine: store.scraperEngine,
+      store: store.key,
       title,
       selectorPrice,
       jsonLdPrice,
@@ -141,4 +147,40 @@ export async function scrapeProductUrl(productUrl: string): Promise<ScrapeResult
       finalUrl: response.url,
     }),
   };
+};
+
+const browserHtmlScraper: ScraperAdapter = async ({ store }) => {
+  throw new Error(
+    `${store.name} ยังไม่เปิดใช้งานในระบบตอนนี้: ต้องเพิ่ม browser scraper, anti-bot handling, และ parser เฉพาะร้านก่อน`,
+  );
+};
+
+const apiScraper: ScraperAdapter = async ({ store }) => {
+  throw new Error(`${store.name} ยังไม่มี API scraper ที่เปิดใช้งาน`);
+};
+
+const SCRAPER_REGISTRY: Record<StoreConfig["scraperEngine"], ScraperAdapter> = {
+  "http-html": httpHtmlScraper,
+  "browser-html": browserHtmlScraper,
+  api: apiScraper,
+};
+
+export async function scrapeProductUrl(productUrl: string): Promise<ScrapeResult> {
+  const store = resolveStoreByUrl(productUrl);
+
+  if (!store) {
+    throw new Error("ลิงก์ร้านค้านี้ยังไม่รู้จักในระบบ");
+  }
+
+  if (!store.isEnabled) {
+    throw new Error(store.supportNotes || `${store.name} ยังไม่เปิดใช้งาน`);
+  }
+
+  const adapter = SCRAPER_REGISTRY[store.scraperEngine];
+
+  if (!adapter) {
+    throw new Error(`ยังไม่มี scraper engine สำหรับ ${store.name}`);
+  }
+
+  return adapter({ productUrl, store });
 }

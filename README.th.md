@@ -12,8 +12,8 @@ PriceRadar TH คือแอปติดตามราคาสินค้า
 ดาวน์โหลด desktop build ล่าสุดได้จากหน้า [Releases](https://github.com/stoprider/priceradar/releases)
 
 เวอร์ชันที่แนะนำตอนนี้:
-- ตัวติดตั้ง Windows: `v0.1.4`
-- หน้า release: `https://github.com/stoprider/priceradar/releases/tag/v0.1.4`
+- ตัวติดตั้ง Windows: `v0.1.5`
+- หน้า release: `https://github.com/stoprider/priceradar/releases/tag/v0.1.5`
 
 ## ภาพหน้าจอ
 หน้าแรก
@@ -38,6 +38,8 @@ PriceRadar TH คือแอปติดตามราคาสินค้า
 - desktop runtime บน Windows ที่ใช้ SQLite
 - ระบบเช็กอัปเดตจาก GitHub Releases
 - pipeline สำหรับ build ตัวติดตั้ง Windows ด้วย Electron
+- แจ้งเตือน Telegram ได้ทั้งตอนถึงราคาเป้าหมายและตอนราคาลดลงจริง
+- โครง scraper รองรับการต่อยอด marketplace สำหรับ Shopee, Lazada และ Temu ในรอบถัดไป
 
 ## เทคโนโลยีที่ใช้
 - Next.js 16 + TypeScript
