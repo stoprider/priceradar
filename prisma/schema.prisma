@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum ProductStatus {
+  IN_STOCK
+  OUT_OF_STOCK
+  UNKNOWN
+}
+
+enum ConfidenceLevel {
+  HIGH
+  MEDIUM
+  LOW
+  FAILED
+}
+
+enum DealScoreBand {
+  HOT_DEAL
+  BEST_PRICE
+  GOOD_DEAL
+  NORMAL
+  WAIT
+}
+
+model User {
+  id               String            @id @default(cuid())
+  name             String
+  email            String            @unique
+  passwordHash     String?
+  telegramChatId   String?
+  telegramEnabled  Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  products         Product[]
+  watchlists       Watchlist[]
+  alertRules       AlertRule[]
+  notificationLogs NotificationLog[]
+}
+
+model Store {
+  id         String      @id @default(cuid())
+  key        String      @unique
+  name       String
+  baseUrl    String
+  isActive   Boolean     @default(true)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  products   Product[]
+  scrapeLogs ScrapeLog[]
+}
+
+model Product {
+  id               String            @id @default(cuid())
+  userId           String
+  storeId          String
+  title            String
+  slug             String            @unique
+  imageUrl         String?
+  sourceUrl        String            @unique
+  currentPrice     Decimal
+  targetPrice      Decimal?
+  currency         String            @default("THB")
+  status           ProductStatus     @default(UNKNOWN)
+  confidenceLevel  ConfidenceLevel   @default(MEDIUM)
+  confidenceReason String?
+  dealScoreBand    DealScoreBand     @default(NORMAL)
+  dealScoreValue   Int               @default(50)
+  lowest30d        Decimal?
+  average30d       Decimal?
+  lastCheckedAt    DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  store            Store             @relation(fields: [storeId], references: [id])
+  watchlistItems   WatchlistItem[]
+  priceHistory     PriceHistory[]
+  snapshots        PriceSnapshot[]
+  alertRules       AlertRule[]
+
+  @@index([userId, createdAt])
+  @@index([storeId, updatedAt])
+}
+
+model Watchlist {
+  id          String          @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  publicId    String          @unique
+  isPublic    Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items       WatchlistItem[]
+
+  @@index([userId, createdAt])
+}
+
+model WatchlistItem {
+  id          String    @id @default(cuid())
+  watchlistId String
+  productId   String
+  note        String?
+  createdAt   DateTime  @default(now())
+  watchlist   Watchlist @relation(fields: [watchlistId], references: [id], onDelete: Cascade)
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([watchlistId, productId])
+}
+
+model PriceHistory {
+  id        String   @id @default(cuid())
+  productId String
+  price     Decimal
+  checkedAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, checkedAt])
+}
+
+model PriceSnapshot {
+  id              String          @id @default(cuid())
+  productId       String
+  capturedAt      DateTime        @default(now())
+  price           Decimal
+  status          ProductStatus   @default(UNKNOWN)
+  confidenceLevel ConfidenceLevel @default(MEDIUM)
+  rawPayload      String?
+  product         Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, capturedAt])
+}
+
+model AlertRule {
+  id          String   @id @default(cuid())
+  userId      String
+  productId   String
+  targetPrice Decimal
+  isEnabled   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+model ScrapeLog {
+  id             String   @id @default(cuid())
+  storeId        String?
+  productUrl     String
+  success        Boolean
+  message        String
+  scrapedPrice   Decimal?
+  responseTimeMs Int
+  createdAt      DateTime @default(now())
+  store          Store?   @relation(fields: [storeId], references: [id])
+
+  @@index([createdAt])
+}
+
+model NotificationLog {
+  id        String   @id @default(cuid())
+  userId    String
+  channel   String
+  title     String
+  body      String
+  wasSent   Boolean  @default(false)
+  sentAt    DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
