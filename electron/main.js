@@ -7,12 +7,15 @@ const { autoUpdater } = require("electron-updater");
 
 const { app, BrowserWindow, dialog, shell } = electron;
 
+const APP_TITLE = "PriceRadar TH";
 const DESKTOP_PORT = 3230;
 const DESKTOP_HOST = "127.0.0.1";
+const UPDATE_CHECK_INTERVAL_MS = 1000 * 60 * 60 * 6;
 const desktopLogPath = path.join(os.tmpdir(), "priceradar-desktop.log");
 
 let mainWindow = null;
 let updatePromptVisible = false;
+let updateChannel = "stable";
 
 function writeLog(message) {
   const line = `[${new Date().toISOString()}] ${message}\n`;
@@ -83,6 +86,20 @@ function ensureRuntimeSecrets() {
   return JSON.parse(fs.readFileSync(secretPath, "utf8"));
 }
 
+function resolveUpdateChannel() {
+  const forcedChannel = process.env.PR_UPDATE_CHANNEL?.trim().toLowerCase();
+
+  if (forcedChannel === "beta") {
+    return "beta";
+  }
+
+  if (forcedChannel === "stable") {
+    return "stable";
+  }
+
+  return app.getVersion().includes("-beta") ? "beta" : "stable";
+}
+
 async function waitForServer(url, timeoutMs = 30000) {
   const startedAt = Date.now();
 
@@ -126,17 +143,36 @@ function startBundledServer() {
   writeLog("Bundled server required successfully");
 }
 
+function setProgressState(progress) {
+  if (!mainWindow) {
+    return;
+  }
+
+  if (progress == null) {
+    mainWindow.setProgressBar(-1);
+    mainWindow.setTitle(APP_TITLE);
+    return;
+  }
+
+  const bounded = Math.max(0, Math.min(progress, 1));
+  mainWindow.setProgressBar(bounded);
+  mainWindow.setTitle(`${APP_TITLE} • กำลังดาวน์โหลดอัปเดต ${Math.round(bounded * 100)}%`);
+}
+
 function wireAutoUpdater() {
   if (!isDesktopReleaseBuild()) {
     writeLog("Skipping auto-update setup for non-packaged or dev runtime");
     return;
   }
 
+  updateChannel = resolveUpdateChannel();
+  autoUpdater.channel = updateChannel;
+  autoUpdater.allowPrerelease = updateChannel === "beta";
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
 
   autoUpdater.on("checking-for-update", () => {
-    writeLog("Checking for updates");
+    writeLog(`Checking for updates on ${updateChannel} channel`);
   });
 
   autoUpdater.on("update-available", async (info) => {
@@ -153,15 +189,22 @@ function wireAutoUpdater() {
       defaultId: 0,
       cancelId: 1,
       title: "มีอัปเดตใหม่",
-      message: `พบ PriceRadar TH เวอร์ชัน ${info.version}`,
-      detail: "ต้องการดาวน์โหลดอัปเดตตอนนี้หรือไม่",
+      message: `พบ ${APP_TITLE} เวอร์ชัน ${info.version}`,
+      detail: `ช่องทางอัปเดตปัจจุบัน: ${updateChannel}\nต้องการดาวน์โหลดตอนนี้หรือไม่`,
     });
     updatePromptVisible = false;
 
     if (result.response === 0) {
       writeLog(`Downloading update ${info.version}`);
+      setProgressState(0);
       void autoUpdater.downloadUpdate();
     }
+  });
+
+  autoUpdater.on("download-progress", (progress) => {
+    const fraction = (progress.percent ?? 0) / 100;
+    writeLog(`Update download progress: ${progress.percent?.toFixed?.(1) ?? progress.percent}%`);
+    setProgressState(fraction);
   });
 
   autoUpdater.on("update-not-available", () => {
@@ -171,10 +214,12 @@ function wireAutoUpdater() {
   autoUpdater.on("error", (error) => {
     const message = error instanceof Error ? error.message : String(error);
     writeLog(`Auto-update error: ${message}`);
+    setProgressState(null);
   });
 
   autoUpdater.on("update-downloaded", async (info) => {
     writeLog(`Update downloaded: ${info.version}`);
+    setProgressState(null);
 
     const result = await dialog.showMessageBox({
       type: "info",
@@ -182,7 +227,7 @@ function wireAutoUpdater() {
       defaultId: 0,
       cancelId: 1,
       title: "พร้อมติดตั้งอัปเดต",
-      message: `ดาวน์โหลด PriceRadar TH เวอร์ชัน ${info.version} เรียบร้อยแล้ว`,
+      message: `ดาวน์โหลด ${APP_TITLE} เวอร์ชัน ${info.version} เรียบร้อยแล้ว`,
       detail: "สามารถติดตั้งและเปิดแอปใหม่ได้ทันที",
     });
 
@@ -198,9 +243,10 @@ async function createWindow() {
     height: 900,
     minWidth: 1180,
     minHeight: 760,
-    title: "PriceRadar TH",
+    title: APP_TITLE,
     autoHideMenuBar: true,
-    icon: getRootPath("src", "app", "favicon.ico"),
+    backgroundColor: "#0E2338",
+    icon: getRootPath("build", "icon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
@@ -209,6 +255,10 @@ async function createWindow() {
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: "deny" };
+  });
+
+  mainWindow.on("closed", () => {
+    mainWindow = null;
   });
 
   if (process.env.ELECTRON_START_URL) {
@@ -242,6 +292,9 @@ app.whenReady().then(async () => {
 
     if (isDesktopReleaseBuild()) {
       void autoUpdater.checkForUpdates();
+      setInterval(() => {
+        void autoUpdater.checkForUpdates();
+      }, UPDATE_CHECK_INTERVAL_MS);
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown desktop startup error";

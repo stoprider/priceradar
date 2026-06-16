@@ -77,6 +77,7 @@ npm run lint
 npm run prices:check
 npm run desktop:dev
 npm run build:desktop
+npm run build:desktop:beta
 ```
 
 ## Windows Installer
@@ -91,6 +92,27 @@ Desktop release builds now include:
 - custom app and installer icon
 - GitHub Release-based update checks from inside the app
 - `latest.yml` metadata for desktop update flows
+
+## Desktop Release Ops
+Environment variables for real distribution are documented in `.env.release.example`.
+
+For production desktop releases, set:
+- `GH_TOKEN` for GitHub Release publish and update metadata
+- `PR_UPDATE_CHANNEL=stable` or `beta`
+- `CSC_LINK` and `CSC_KEY_PASSWORD` for Windows code signing
+
+Typical flow:
+
+```bash
+npm run assets:icons
+npm run build:desktop
+```
+
+Beta channel build:
+
+```bash
+npm run build:desktop:beta
+```
 
 If your shell has `ELECTRON_RUN_AS_NODE=1`, launch the desktop app through:
 
