@@ -2,7 +2,18 @@
 
 [English](./README.md)
 
+[![Release](https://img.shields.io/github/v/release/stoprider/priceradar)](https://github.com/stoprider/priceradar/releases)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Web-0B5A72)](https://github.com/stoprider/priceradar/releases)
+[![License](https://img.shields.io/github/license/stoprider/priceradar)](./LICENSE)
+
 PriceRadar TH คือแอปติดตามราคาสินค้าสำหรับอีคอมเมิร์ซในประเทศไทย รองรับทั้งแบบเว็บและโปรแกรมติดตั้งบน Windows
+
+## ดาวน์โหลด
+ดาวน์โหลด desktop build ล่าสุดได้จากหน้า [Releases](https://github.com/stoprider/priceradar/releases)
+
+เวอร์ชันที่แนะนำตอนนี้:
+- ตัวติดตั้ง Windows: `v0.1.3`
+- หน้า release: `https://github.com/stoprider/priceradar/releases/tag/v0.1.3`
 
 ## จุดเด่น
 - ระบบติดตามสินค้า, watchlist, dashboard, และหน้ารายละเอียดสินค้า

@@ -2,7 +2,18 @@
 
 [ภาษาไทย](./README.th.md)
 
+[![Release](https://img.shields.io/github/v/release/stoprider/priceradar)](https://github.com/stoprider/priceradar/releases)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Web-0B5A72)](https://github.com/stoprider/priceradar/releases)
+[![License](https://img.shields.io/github/license/stoprider/priceradar)](./LICENSE)
+
 PriceRadar TH is a Thai-first price tracking app for Thailand e-commerce, with web and Windows desktop distribution.
+
+## Download
+Latest desktop builds are available on the [Releases page](https://github.com/stoprider/priceradar/releases).
+
+Current recommended version:
+- Windows installer: `v0.1.3`
+- Release page: `https://github.com/stoprider/priceradar/releases/tag/v0.1.3`
 
 ## Highlights
 - Product tracking, watchlists, dashboard, and product detail pages
