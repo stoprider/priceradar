@@ -1,11 +1,13 @@
-const { app, BrowserWindow, dialog, shell } = require("electron");
 const crypto = require("node:crypto");
 const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
+const electron = require("electron");
+const { app, BrowserWindow, dialog, shell } = electron;
 
 const DESKTOP_PORT = 3230;
 const DESKTOP_HOST = "127.0.0.1";
-const desktopLogPath = path.join(app.getPath("temp"), "priceradar-desktop.log");
+const desktopLogPath = path.join(os.tmpdir(), "priceradar-desktop.log");
 
 let mainWindow = null;
 
@@ -15,7 +17,7 @@ function writeLog(message) {
 }
 
 function getRootPath(...segments) {
-  const basePath = app.isPackaged ? process.resourcesPath : app.getAppPath();
+  const basePath = app.getAppPath();
   return path.join(basePath, ...segments);
 }
 
@@ -29,17 +31,24 @@ function getStandaloneDirectory() {
   return getRootPath(".next", "standalone");
 }
 
+if (!app || typeof app.whenReady !== "function") {
+  const reason =
+    "Electron runtime is unavailable. Clear ELECTRON_RUN_AS_NODE and relaunch PriceRadar TH.";
+
+  writeLog(reason);
+  throw new Error(reason);
+}
+
 function ensureDirectory(dirPath) {
   fs.mkdirSync(dirPath, { recursive: true });
 }
 
-function toPrismaSqliteUrl(filePath) {
-  return `file:/${filePath.replace(/\\/g, "/")}`;
+function getRuntimeDirectory() {
+  return path.join(app.getPath("userData"), "runtime");
 }
 
 function ensureDesktopDatabase() {
-  const userDataPath = app.getPath("userData");
-  const runtimePath = path.join(userDataPath, "runtime");
+  const runtimePath = getRuntimeDirectory();
   const databasePath = path.join(runtimePath, "priceradar.db");
   const bundledDatabasePath = getRootPath("desktop", "assets", "priceradar.db");
 
@@ -54,8 +63,7 @@ function ensureDesktopDatabase() {
 }
 
 function ensureRuntimeSecrets() {
-  const userDataPath = app.getPath("userData");
-  const runtimePath = path.join(userDataPath, "runtime");
+  const runtimePath = getRuntimeDirectory();
   const secretPath = path.join(runtimePath, "desktop-secrets.json");
 
   ensureDirectory(runtimePath);
@@ -93,22 +101,24 @@ async function waitForServer(url, timeoutMs = 30000) {
 function startBundledServer() {
   const secrets = ensureRuntimeSecrets();
   const databasePath = ensureDesktopDatabase();
+  const runtimePath = getRuntimeDirectory();
   const standaloneDir = getStandaloneDirectory();
   const serverEntry = path.join(standaloneDir, "server.js");
   writeLog(`Starting bundled server from ${serverEntry}`);
   writeLog(`Database path: ${databasePath}`);
+  writeLog(`Runtime path: ${runtimePath}`);
 
   process.env.NODE_ENV = "production";
   process.env.PORT = String(DESKTOP_PORT);
   process.env.HOSTNAME = DESKTOP_HOST;
   process.env.PR_DESKTOP = "1";
-  process.env.DATABASE_URL = toPrismaSqliteUrl(databasePath);
+  process.env.DATABASE_URL = "file:./priceradar.db";
   process.env.SESSION_SECRET = secrets.sessionSecret;
   process.env.NEXTAUTH_SECRET = secrets.sessionSecret;
   process.env.NEXTAUTH_URL = `http://${DESKTOP_HOST}:${DESKTOP_PORT}`;
 
-  process.chdir(standaloneDir);
-  writeLog(`Changed cwd to ${standaloneDir}`);
+  process.chdir(runtimePath);
+  writeLog(`Changed cwd to ${runtimePath}`);
   require(serverEntry);
   writeLog("Bundled server required successfully");
 }

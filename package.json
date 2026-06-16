@@ -1,7 +1,9 @@
 {
   "name": "priceradar-th",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
+  "description": "Thai-first desktop and web price tracker for Thailand e-commerce",
+  "author": "stoprider",
   "main": "electron/main.js",
   "scripts": {
     "dev": "next dev",
@@ -13,7 +15,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "scrape:mock": "tsx src/server/jobs/run-mock-check.ts",
     "prices:check": "tsx src/server/jobs/run-price-checks.ts",
-    "desktop:dev": "concurrently -k \"npm:dev\" \"wait-on http://127.0.0.1:3000 && cross-env ELECTRON_START_URL=http://127.0.0.1:3000 electron .\"",
+    "desktop:dev": "concurrently -k \"npm:dev\" \"wait-on http://127.0.0.1:3000 && node scripts/run-electron-dev.mjs\"",
     "build:desktop": "npm run build && node scripts/prepare-desktop-bundle.mjs && electron-builder --win nsis",
     "postinstall": "prisma generate"
   },

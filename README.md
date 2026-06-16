@@ -88,6 +88,14 @@ npm run build:desktop
 
 The installer output is written to `dist-desktop/`.
 
+If your shell has `ELECTRON_RUN_AS_NODE=1`, launch the desktop app through:
+
+```bash
+npm run desktop:dev
+```
+
+That helper clears the conflicting environment flag before starting Electron.
+
 ## Docker
 Run the full app stack with SQLite-backed app container:
 
