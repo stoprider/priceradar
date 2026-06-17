@@ -37,7 +37,7 @@ export function AppShell({
             </div>
             <div>
               <div className="text-sm uppercase tracking-[0.22em] text-[color:var(--color-ink-soft)]">PriceRadar TH</div>
-              <div className="text-base font-semibold text-[color:var(--color-ink)]">ระบบติดตามราคาพรีเมียม</div>
+              <div className="text-base font-semibold text-[color:var(--color-ink)]">ระบบติดตามราคาแบบพร้อมใช้งานจริง</div>
             </div>
           </Link>
 
@@ -66,11 +66,13 @@ export function AppShell({
               การแจ้งเตือน
             </div>
             <p className="mt-3 text-sm text-white/72">
-              รองรับการแจ้งเตือนผ่าน Telegram และพร้อมต่อยอดเป็นตัวดึงราคาจริงของแต่ละร้านค้าได้ในขั้นถัดไป
+              รองรับการแจ้งเตือนผ่าน Telegram และออกแบบโครงสร้างไว้สำหรับต่อยอดตัวดึงราคาจริงของแต่ละร้านค้าในรอบถัดไป
             </p>
-            <Button className="mt-4 w-full" variant="secondary">
-              ตั้งค่าบอต
-            </Button>
+            <Link href="/settings" className="mt-4 block">
+              <Button className="w-full" variant="secondary">
+                ตั้งค่า Telegram
+              </Button>
+            </Link>
           </div>
         </aside>
 

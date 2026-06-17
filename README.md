@@ -6,49 +6,28 @@
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Web-0B5A72)](https://github.com/stoprider/priceradar/releases)
 [![License](https://img.shields.io/github/license/stoprider/priceradar)](./LICENSE)
 
-PriceRadar TH is a Thai-first price tracking app for Thailand e-commerce, with web and Windows desktop distribution.
+PriceRadar TH is a Thai-first price tracking app for Thailand e-commerce, with both web and Windows desktop distribution.
 
 ## Download
 Latest desktop builds are available on the [Releases page](https://github.com/stoprider/priceradar/releases).
 
 Current recommended version:
-- Windows installer: `v0.1.7`
-- Release page: `https://github.com/stoprider/priceradar/releases/tag/v0.1.7`
-
-## Screenshots
-Landing page
-
-![PriceRadar TH landing page](./docs/screenshots/home.png)
-
-Dashboard
-
-![PriceRadar TH dashboard](./docs/screenshots/dashboard.png)
-
-Tracked products
-
-![PriceRadar TH products page](./docs/screenshots/products.png)
-
-Watchlists
-
-![PriceRadar TH watchlists page](./docs/screenshots/watchlists.png)
+- Windows installer: `v0.1.8`
+- Release page: `https://github.com/stoprider/priceradar/releases/tag/v0.1.8`
 
 ## Highlights
-- Product tracking, watchlists, dashboard, and product detail pages
-- Signed cookie auth with seeded demo account
-- SQLite-backed desktop runtime for Windows
-- GitHub Release-based desktop update flow
-- Windows installer build pipeline with Electron
+- Product tracking, dashboard, watchlists, and product detail pages
 - Telegram alerts for target price and real price drops
-- In-app Telegram settings with bot token, chat ID, delivery status, and test send
-- Marketplace detection and readiness notes for Shopee, Lazada, and Temu, with production-safe blocking when upstream anti-bot or incomplete HTML prevents reliable scraping
+- In-app Telegram settings with bot token, chat ID, status, and test send
+- Windows installer with GitHub Release-based update flow
+- Marketplace detection for Shopee, Lazada, and Temu, while keeping unsupported sources blocked in production
 
 ## Stack
 - Next.js 16 + TypeScript
 - Tailwind CSS
 - Prisma + SQLite
-- Recharts
-- Playwright
 - Electron + electron-builder
+- Playwright
 
 ## Local Development
 1. Install dependencies
@@ -57,13 +36,13 @@ Watchlists
 npm install
 ```
 
-2. Create your environment file
+2. Create environment file
 
 ```bash
 copy .env.example .env
 ```
 
-3. Prepare the database
+3. Prepare database
 
 ```bash
 npm run db:generate
@@ -78,7 +57,7 @@ email: demo@priceradar.th
 password: demo12345
 ```
 
-4. Start the web app
+4. Start development server
 
 ```bash
 npm run dev
@@ -89,9 +68,9 @@ Open `http://localhost:3000`
 ## Useful Commands
 ```bash
 npm run lint
+npm run build
 npm run prices:check
 npm run desktop:dev
-npm run assets:icons
 npm run build:desktop
 npm run build:desktop:beta
 ```
@@ -103,24 +82,9 @@ Build a Windows installer:
 npm run build:desktop
 ```
 
-Beta channel build:
+Artifacts are written to `dist-desktop/`.
 
-```bash
-npm run build:desktop:beta
-```
-
-Output is written to `dist-desktop/`.
-
-Desktop release builds include:
-- branded app and installer icon
-- GitHub Release-based update checks
-- `latest.yml` metadata for desktop updates
-
-If your environment has `ELECTRON_RUN_AS_NODE=1`, the installed Windows shortcuts now launch through a bundled launcher that clears it automatically. For local development, you can still use:
-
-```bash
-npm run desktop:dev
-```
+If your environment has `ELECTRON_RUN_AS_NODE=1`, the installed Windows shortcuts launch through a bundled launcher that clears it automatically.
 
 ## Release Environment
 Real distribution settings are documented in `.env.release.example`.
@@ -131,19 +95,8 @@ Common release variables:
 - `CSC_LINK`
 - `CSC_KEY_PASSWORD`
 
-## Docker
-Run the app with Docker:
-
-```bash
-docker compose up --build
-```
-
-Endpoints:
-- app: `http://localhost:3000`
-- health: `http://localhost:3000/api/health`
-
 ## Notes
 - Production deployment still needs a strong `SESSION_SECRET`.
 - Telegram alerts require valid Telegram credentials.
 - Live scraping selectors may need maintenance when retailer markup changes.
-- Shopee, Lazada, and Temu are recognized in the app, but remain blocked for production tracking until their upstream pages expose stable data paths again.
+- Shopee, Lazada, and Temu are recognized in the app, but remain blocked for production tracking until reliable upstream data paths are available.

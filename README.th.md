@@ -9,46 +9,25 @@
 PriceRadar TH คือแอปติดตามราคาสินค้าสำหรับอีคอมเมิร์ซในประเทศไทย รองรับทั้งแบบเว็บและโปรแกรมติดตั้งบน Windows
 
 ## ดาวน์โหลด
-ดาวน์โหลด desktop build ล่าสุดได้จากหน้า [Releases](https://github.com/stoprider/priceradar/releases)
+ดาวน์โหลดเดสก์ท็อปล่าสุดได้จากหน้า [Releases](https://github.com/stoprider/priceradar/releases)
 
-เวอร์ชันที่แนะนำตอนนี้:
-- ตัวติดตั้ง Windows: `v0.1.7`
-- หน้า release: `https://github.com/stoprider/priceradar/releases/tag/v0.1.7`
-
-## ภาพหน้าจอ
-หน้าแรก
-
-![PriceRadar TH หน้าแรก](./docs/screenshots/home.png)
-
-แดชบอร์ด
-
-![PriceRadar TH แดชบอร์ด](./docs/screenshots/dashboard.png)
-
-หน้าสินค้าที่ติดตาม
-
-![PriceRadar TH หน้าสินค้า](./docs/screenshots/products.png)
-
-หน้ารายการเฝ้าดู
-
-![PriceRadar TH หน้ารายการเฝ้าดู](./docs/screenshots/watchlists.png)
+เวอร์ชันแนะนำตอนนี้:
+- ตัวติดตั้ง Windows: `v0.1.8`
+- หน้า release: `https://github.com/stoprider/priceradar/releases/tag/v0.1.8`
 
 ## จุดเด่น
-- ระบบติดตามสินค้า, watchlist, dashboard, และหน้ารายละเอียดสินค้า
-- ระบบล็อกอินด้วย signed cookie พร้อมบัญชี demo
-- desktop runtime บน Windows ที่ใช้ SQLite
-- ระบบเช็กอัปเดตจาก GitHub Releases
-- pipeline สำหรับ build ตัวติดตั้ง Windows ด้วย Electron
-- แจ้งเตือน Telegram ได้ทั้งตอนถึงราคาเป้าหมายและตอนราคาลดลงจริง
-- มีหน้า Telegram settings ในแอปพร้อม bot token, chat ID, สถานะ, และปุ่มทดสอบส่ง
-- โครง scraper รองรับการต่อยอด marketplace สำหรับ Shopee, Lazada และ Temu ในรอบถัดไป
+- ติดตามสินค้า ดูแดชบอร์ด รายละเอียดสินค้า และรายการเฝ้าดูได้ในแอปเดียว
+- แจ้งเตือนผ่าน Telegram ได้ทั้งตอนราคาลดลงและตอนถึงราคาเป้าหมาย
+- มีหน้า Settings สำหรับตั้งค่า bot token, chat ID, สถานะ และปุ่มทดสอบส่ง
+- มีตัวติดตั้ง Windows พร้อมระบบอัปเดตผ่าน GitHub Releases
+- รู้จักลิงก์ Shopee, Lazada และ Temu แต่ยังบล็อกไว้ใน production จนกว่าจะมีเส้นทางดึงข้อมูลที่เสถียร
 
 ## เทคโนโลยีที่ใช้
 - Next.js 16 + TypeScript
 - Tailwind CSS
 - Prisma + SQLite
-- Recharts
-- Playwright
 - Electron + electron-builder
+- Playwright
 
 ## พัฒนาในเครื่อง
 1. ติดตั้ง dependency
@@ -78,7 +57,7 @@ email: demo@priceradar.th
 password: demo12345
 ```
 
-4. รันเว็บแอป
+4. รันเซิร์ฟเวอร์สำหรับพัฒนา
 
 ```bash
 npm run dev
@@ -89,60 +68,35 @@ npm run dev
 ## คำสั่งที่ใช้บ่อย
 ```bash
 npm run lint
+npm run build
 npm run prices:check
 npm run desktop:dev
-npm run assets:icons
 npm run build:desktop
 npm run build:desktop:beta
 ```
 
-## Build โปรแกรม Windows
-สร้างตัวติดตั้ง Windows:
+## สร้างโปรแกรม Windows
+สร้างตัวติดตั้ง:
 
 ```bash
 npm run build:desktop
 ```
 
-ถ้าต้องการ build สำหรับ beta channel:
+ไฟล์ผลลัพธ์จะอยู่ใน `dist-desktop/`
 
-```bash
-npm run build:desktop:beta
-```
+ถ้าเครื่องมี `ELECTRON_RUN_AS_NODE=1` อยู่แล้ว shortcut ที่ติดตั้งจากโปรแกรมจะเรียก launcher ที่ล้างค่านี้ให้อัตโนมัติ
 
-ไฟล์ output จะอยู่ใน `dist-desktop/`
+## ตัวแปรสำหรับปล่อยจริง
+ดูตัวอย่างได้ใน `.env.release.example`
 
-desktop release ปัจจุบันมี:
-- ไอคอนแอปและไอคอนตัวติดตั้งแบบ branded
-- ระบบเช็กอัปเดตจาก GitHub Releases
-- ไฟล์ `latest.yml` สำหรับ desktop update flow
-
-ถ้า shell ของคุณมี `ELECTRON_RUN_AS_NODE=1` ให้ใช้:
-
-```bash
-npm run desktop:dev
-```
-
-## Environment สำหรับปล่อยจริง
-ค่าที่ใช้ตอนปล่อย release จริงอยู่ใน `.env.release.example`
-
-ตัวแปรสำคัญ:
+ค่าที่ใช้บ่อย:
 - `GH_TOKEN`
 - `PR_UPDATE_CHANNEL=latest` หรือ `beta`
 - `CSC_LINK`
 - `CSC_KEY_PASSWORD`
 
-## Docker
-รันแอปผ่าน Docker:
-
-```bash
-docker compose up --build
-```
-
-Endpoints:
-- app: `http://localhost:3000`
-- health: `http://localhost:3000/api/health`
-
 ## หมายเหตุ
 - ถ้าจะใช้ production จริง ควรเปลี่ยน `SESSION_SECRET` ให้แข็งแรง
 - ถ้าจะเปิด Telegram alerts ต้องใส่ credential จริง
 - selector สำหรับ scraping อาจต้องปรับเมื่อหน้าเว็บร้านค้ามีการเปลี่ยนแปลง
+- Shopee, Lazada และ Temu ยังไม่เปิด production tracking จนกว่าจะมีเส้นทางดึงข้อมูลที่เชื่อถือได้

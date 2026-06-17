@@ -13,7 +13,7 @@ export default function HomePage() {
           <div>
             <div className="text-sm uppercase tracking-[0.24em] text-[color:var(--color-ink-soft)]">PriceRadar TH</div>
             <h1 className="mt-3 max-w-3xl text-5xl font-semibold leading-[1.02] tracking-[-0.06em] text-[color:var(--color-ink)]">
-              ระบบติดตามราคาสำหรับคนไทย ที่ให้ประสบการณ์เหมือนโปรดักชันจริง ไม่ใช่แค่เทมเพลต
+              ระบบติดตามราคาสำหรับคนไทย ที่เน้นใช้งานจริง ดูง่าย และพร้อมต่อยอดเป็นเครื่องมือ production
             </h1>
           </div>
           <div className="flex gap-3">
@@ -30,14 +30,14 @@ export default function HomePage() {
           <Card className="overflow-hidden p-6">
             <div className="flex items-center gap-2 text-sm uppercase tracking-[0.22em] text-[color:var(--color-ink-soft)]">
               <Sparkles className="h-4 w-4" />
-              ขั้นตอนการใช้งาน MVP
+              ขั้นตอนการใช้งาน
             </div>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               {[
                 "วางลิงก์สินค้าจาก HomePro, Power Buy, Advice หรือ JIB",
-                "ดึงข้อมูลสินค้าและราคาจากหน้าร้านที่รองรับ",
+                "ดึงข้อมูลสินค้าและราคาจริงจากหน้าร้านที่รองรับ",
                 "บันทึกสแนปราคาและประวัติย้อนหลัง 30 วัน",
-                "คำนวณความคุ้มค่าและเตรียมแจ้งเตือนผ่าน Telegram",
+                "คำนวณความคุ้มค่าและแจ้งเตือนผ่าน Telegram เมื่อราคาลดลงหรือถึงเป้าหมาย",
               ].map((item) => (
                 <div key={item} className="rounded-[1.5rem] bg-[color:var(--color-surface-alt)] p-5 text-sm leading-6 text-[color:var(--color-ink-muted)]">
                   {item}
@@ -51,13 +51,13 @@ export default function HomePage() {
             <div className="mt-4 text-2xl font-semibold tracking-[-0.04em] text-[color:var(--color-ink)]">{products[1].title}</div>
             <div className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-[color:var(--color-ink)]">{formatCurrency(products[1].currentPrice)}</div>
             <p className="mt-3 text-sm leading-6 text-[color:var(--color-ink-muted)]">
-              ราคาต่ำสุดที่ระบบติดตามพบในช่วง 30 วันที่ผ่านมา พร้อมความเชื่อมั่นสูงจากการจับคู่ข้อมูลสินค้า
+              แสดงตัวอย่างการอ่านราคาล่าสุดและมุมมองโอกาสซื้อจากข้อมูลย้อนหลังที่ระบบเก็บไว้
             </p>
             <div className="mt-6 grid gap-3">
               {[
                 { icon: ChartSpline, text: "ดูกราฟราคาและราคาต่ำสุดในรอบ 30 วัน" },
                 { icon: Bell, text: "รองรับการแจ้งเตือนผ่าน Telegram เมื่อราคาถึงเป้าหมาย" },
-                { icon: ShieldCheck, text: "มีระดับความเชื่อมั่นเพื่อบอกว่าราคาน่าเชื่อถือแค่ไหน" },
+                { icon: ShieldCheck, text: "มีระดับความเชื่อมั่นเพื่อช่วยประเมินว่าราคาที่ดึงมาน่าเชื่อถือแค่ไหน" },
               ].map(({ icon: Icon, text }) => (
                 <div key={text} className="flex items-center gap-3 rounded-2xl bg-[color:var(--color-surface-alt)] px-4 py-3 text-sm text-[color:var(--color-ink-muted)]">
                   <Icon className="h-4 w-4 text-[color:var(--color-accent)]" />

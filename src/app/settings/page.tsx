@@ -24,7 +24,11 @@ export default async function SettingsPage({
   const isTelegramReady = hasBotToken && hasChatId;
 
   return (
-    <AppShell user={user} title="ตั้งค่า" description="จัดการข้อมูลบัญชี การเชื่อมต่อ Telegram และทดสอบการแจ้งเตือนจากระบบได้ในหน้าเดียว">
+    <AppShell
+      user={user}
+      title="ตั้งค่า"
+      description="จัดการข้อมูลบัญชี การเชื่อมต่อ Telegram และทดสอบการแจ้งเตือนจากระบบได้ในหน้าเดียว"
+    >
       {params.success ? <p className="mb-4 text-sm text-emerald-700">{params.success}</p> : null}
       {params.error ? <p className="mb-4 text-sm text-rose-600">{params.error}</p> : null}
 
@@ -36,17 +40,8 @@ export default async function SettingsPage({
             <Input defaultValue={user.email} disabled />
 
             <div className="mt-2 text-sm uppercase tracking-[0.24em] text-[color:var(--color-ink-soft)]">Telegram</div>
-            <Input
-              name="telegramBotToken"
-              defaultValue={user.telegramBotToken || ""}
-              placeholder="Telegram bot token"
-              type="password"
-            />
-            <Input
-              name="telegramChatId"
-              defaultValue={user.telegramChatId || ""}
-              placeholder="Telegram chat ID"
-            />
+            <Input name="telegramBotToken" defaultValue={user.telegramBotToken || ""} placeholder="Telegram bot token" type="password" />
+            <Input name="telegramChatId" defaultValue={user.telegramChatId || ""} placeholder="Telegram chat ID" />
             <label className="flex items-center gap-2 text-sm text-[color:var(--color-ink-muted)]">
               <input name="telegramEnabled" type="checkbox" defaultChecked={user.telegramEnabled} />
               เปิดใช้งานการแจ้งเตือนผ่าน Telegram
@@ -98,7 +93,7 @@ export default async function SettingsPage({
                     <div className="font-semibold text-[color:var(--color-ink)]">{item.title}</div>
                     <div className="mt-1 text-[color:var(--color-ink-muted)]">{item.body}</div>
                     <div className="mt-2 text-xs text-[color:var(--color-ink-soft)]">
-                      {new Date(item.createdAt).toLocaleString("th-TH")} · {item.wasSent ? "ส่งสำเร็จ" : "ยังไม่สำเร็จ"}
+                      {new Date(item.createdAt).toLocaleString("th-TH")} | {item.wasSent ? "ส่งสำเร็จ" : "ส่งไม่สำเร็จ"}
                     </div>
                   </div>
                 ))

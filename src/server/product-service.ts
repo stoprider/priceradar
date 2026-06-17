@@ -83,7 +83,7 @@ async function maybeSendTelegramNotifications(input: {
     });
   }
 
-  if (targetReached) {
+  if (targetReached && targetPrice != null) {
     const response = await sendTelegramAlert({
       title: `ถึงราคาเป้าหมาย: ${input.product.title}`,
       message: `ราคาปัจจุบัน ${input.currentPrice.toLocaleString("th-TH")} บาท ต่ำกว่าหรือเท่ากับราคาเป้าหมาย ${targetPrice.toLocaleString("th-TH")} บาท`,
@@ -108,7 +108,7 @@ export async function runProductCheck(productId: string) {
   });
 
   if (!product) {
-    throw new Error("Product not found");
+    throw new Error("ไม่พบสินค้า");
   }
 
   const startedAt = Date.now();
@@ -170,7 +170,7 @@ export async function runProductCheck(productId: string) {
         storeId: product.storeId,
         productUrl: product.sourceUrl,
         success: true,
-        message: "Product check completed successfully.",
+        message: "ตรวจสอบราคาสำเร็จ",
         scrapedPrice: scraped.currentPrice,
         responseTimeMs: Date.now() - startedAt,
       },
@@ -200,7 +200,7 @@ export async function runProductCheck(productId: string) {
         storeId: product.storeId,
         productUrl: product.sourceUrl,
         success: false,
-        message: error instanceof Error ? error.message : "Unknown scrape error",
+        message: error instanceof Error ? error.message : "เกิดข้อผิดพลาดระหว่างดึงราคา",
         responseTimeMs: Date.now() - startedAt,
       },
     });
@@ -321,7 +321,7 @@ export async function createOrUpdateTrackedProduct(input: {
       storeId: dbStore.id,
       productUrl: product.sourceUrl,
       success: true,
-      message: existing ? "Tracked product updated from live scrape." : "Tracked product created from live scrape.",
+      message: existing ? "อัปเดตสินค้าที่ติดตามจากการดึงข้อมูลจริงแล้ว" : "สร้างสินค้าที่ติดตามจากการดึงข้อมูลจริงแล้ว",
       scrapedPrice: scraped.currentPrice,
       responseTimeMs: 0,
     },

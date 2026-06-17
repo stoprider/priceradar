@@ -158,11 +158,7 @@ export async function testTelegramAction() {
   });
 
   revalidatePath("/settings");
-  redirect(
-    response.ok
-      ? "/settings?success=ส่งข้อความทดสอบ Telegram เรียบร้อยแล้ว"
-      : `/settings?error=${encodeURIComponent(`ทดสอบส่ง Telegram ไม่สำเร็จ: ${response.reason}`)}`,
-  );
+  redirect(response.ok ? "/settings?success=ส่งข้อความทดสอบ Telegram เรียบร้อยแล้ว" : `/settings?error=${encodeURIComponent(`ทดสอบส่ง Telegram ไม่สำเร็จ: ${response.reason}`)}`);
 }
 
 export async function createWatchlistAction(formData: FormData) {

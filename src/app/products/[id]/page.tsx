@@ -42,7 +42,11 @@ export default async function ProductDetailPage({
   const viewModel = toProductCardModel(product);
 
   return (
-    <AppShell user={user} title={product.title} description="ดูรายละเอียดราคาของสินค้าแต่ละรายการ พร้อมระดับดีล ความเชื่อมั่น และกราฟราคาแบบย้อนหลัง">
+    <AppShell
+      user={user}
+      title={product.title}
+      description="ดูรายละเอียดราคาของสินค้าแต่ละรายการ พร้อมระดับดีล ความเชื่อมั่น และกราฟราคาย้อนหลัง"
+    >
       {flash.success ? <p className="mb-4 text-sm text-emerald-700">{flash.success}</p> : null}
       {flash.error ? <p className="mb-4 text-sm text-rose-600">{flash.error}</p> : null}
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
@@ -92,7 +96,7 @@ export default async function ProductDetailPage({
               <dd className="font-semibold text-[color:var(--color-ink)]">{formatCurrency(Number(product.average30d || product.currentPrice))}</dd>
             </div>
             <div className="flex items-center justify-between gap-4">
-              <dt>หมายเหตุความเชื่อมั่น</dt>
+              <dt>เหตุผลความเชื่อมั่น</dt>
               <dd className="max-w-[55%] text-right">{product.confidenceReason}</dd>
             </div>
           </dl>

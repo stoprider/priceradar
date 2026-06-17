@@ -13,11 +13,11 @@ export async function sendTelegramAlert(payload: TelegramPayload) {
   if (!token || !chatId) {
     return {
       ok: false,
-      reason: "Telegram bot token or chat ID is missing.",
+      reason: "ยังไม่ได้ตั้งค่า Telegram bot token หรือ chat ID",
     };
   }
 
-  const text = [`PriceRadar TH`, payload.title, payload.message, payload.url].join("\n");
+  const text = ["PriceRadar TH", payload.title, payload.message, payload.url].join("\n");
 
   const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: "POST",
@@ -31,6 +31,6 @@ export async function sendTelegramAlert(payload: TelegramPayload) {
 
   return {
     ok: response.ok,
-    reason: response.ok ? "Sent" : `Telegram API returned an error (${response.status})`,
+    reason: response.ok ? "ส่งข้อความสำเร็จ" : `Telegram API ตอบกลับข้อผิดพลาด (${response.status})`,
   };
 }

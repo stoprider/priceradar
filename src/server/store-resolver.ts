@@ -80,16 +80,11 @@ export const STORE_CONFIG: readonly StoreConfig[] = [
     selectors: {
       title: ["meta[property='og:title']", "title", "h1"],
       image: ["meta[property='og:image']", "img[alt][src]"],
-      price: [
-        "meta[property='product:price:amount']",
-        "[data-testid*='price']",
-        "[class*='price']",
-        "[class*='Price']",
-      ],
+      price: ["meta[property='product:price:amount']", "[data-testid*='price']", "[class*='price']", "[class*='Price']"],
     },
-    unavailableDetectors: ["ไม่พบรายการสินค้านี้", "ขออภัยค่ะ! ไม่พบรายการสินค้าชินนี้", "item not found"],
+    unavailableDetectors: ["ไม่พบรายการสินค้านี้", "ขออภัยค่ะ! ไม่พบรายการสินค้านี้", "item not found"],
     supportNotes:
-      "ระบบรู้จักลิงก์ Shopee แล้ว แต่หน้าเว็บปัจจุบันไม่ปล่อยชื่อและราคาสินค้าใน HTML ปกติอย่างเสถียร และ endpoint สินค้าตอบกลับแบบป้องกันการดึงอัตโนมัติ จึงยังไม่เปิดใช้งานใน production",
+      "ระบบรู้จักลิงก์ Shopee แล้ว แต่หน้าเว็บปัจจุบันยังไม่ปล่อยชื่อและราคาสินค้าใน HTML ปกติอย่างเสถียร และ endpoint สินค้ามีการป้องกันการดึงอัตโนมัติ จึงยังไม่เปิดใช้งานใน production",
   },
   {
     key: "lazada",
@@ -101,14 +96,9 @@ export const STORE_CONFIG: readonly StoreConfig[] = [
     selectors: {
       title: ["meta[property='og:title']", "title", "h1"],
       image: ["meta[property='og:image']", "img[alt][src]"],
-      price: [
-        "meta[property='product:price:amount']",
-        "[class*='price']",
-        "[class*='Price']",
-        "[data-price]",
-      ],
+      price: ["meta[property='product:price:amount']", "[class*='price']", "[class*='Price']", "[data-price]"],
     },
-    unavailableDetectors: ["ไม่พบรายการสินค้าชินนี้", "ขออภัยค่ะ! ไม่พบรายการสินค้าชินนี้", "404", "not found"],
+    unavailableDetectors: ["ไม่พบรายการสินค้านี้", "ขออภัยค่ะ! ไม่พบรายการสินค้านี้", "404", "not found"],
     supportNotes:
       "ระบบรู้จักลิงก์ Lazada แล้ว แต่หน้าสินค้าจริงหลายลิงก์ตอบกลับหน้าไม่พร้อมใช้งานหรือฝังข้อมูลราคาแบบไม่เสถียร จึงยังไม่เปิดใช้งานใน production",
   },

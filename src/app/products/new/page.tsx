@@ -11,7 +11,11 @@ export default async function NewProductPage({
   const params = await searchParams;
 
   return (
-    <AppShell user={user} title="เพิ่มสินค้า" description="เพิ่มลิงก์สินค้าจากร้านค้าที่รองรับ เพื่อดึงข้อมูลจริง บันทึกราคา และตั้งกฎแจ้งเตือนอัตโนมัติ">
+    <AppShell
+      user={user}
+      title="เพิ่มสินค้า"
+      description="เพิ่มลิงก์สินค้าจากร้านค้าที่รองรับ เพื่อดึงข้อมูลจริง บันทึกราคา และตั้งกฎแจ้งเตือนอัตโนมัติ"
+    >
       <AddProductForm error={params.error} />
     </AppShell>
   );

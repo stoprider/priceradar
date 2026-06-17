@@ -22,12 +22,7 @@ type PriceCandidate = {
 function readFirstContent($: cheerio.CheerioAPI, selectors: readonly string[]) {
   for (const selector of selectors) {
     const element = $(selector).first();
-    const value =
-      element.attr("content")?.trim() ||
-      element.attr("src")?.trim() ||
-      element.attr("data-price")?.trim() ||
-      element.text().trim() ||
-      null;
+    const value = element.attr("content")?.trim() || element.attr("src")?.trim() || element.attr("data-price")?.trim() || element.text().trim() || null;
 
     if (value) {
       return value;
@@ -60,12 +55,7 @@ function normalizeTitle(input: string) {
     .trim();
 }
 
-function addCandidate(
-  map: Map<number, PriceCandidate>,
-  value: number | null | undefined,
-  score: number,
-  source: string,
-) {
+function addCandidate(map: Map<number, PriceCandidate>, value: number | null | undefined, score: number, source: string) {
   if (!value || !Number.isFinite(value) || value <= 0) {
     return;
   }
@@ -151,17 +141,11 @@ function detectPageProblem(store: StoreConfig, html: string, title: string) {
   const lower = html.toLowerCase();
   const normalizedTitle = title.toLowerCase();
 
-  if (
-    store.blockDetectors?.some((keyword) => lower.includes(keyword.toLowerCase()) || normalizedTitle.includes(keyword.toLowerCase()))
-  ) {
+  if (store.blockDetectors?.some((keyword) => lower.includes(keyword.toLowerCase()) || normalizedTitle.includes(keyword.toLowerCase()))) {
     throw new Error(`${store.name} ป้องกันการดึงข้อมูลอัตโนมัติจากลิงก์นี้อยู่ จึงยังไม่สามารถติดตามสินค้าได้ในตอนนี้`);
   }
 
-  if (
-    store.unavailableDetectors?.some(
-      (keyword) => lower.includes(keyword.toLowerCase()) || normalizedTitle.includes(keyword.toLowerCase()),
-    )
-  ) {
+  if (store.unavailableDetectors?.some((keyword) => lower.includes(keyword.toLowerCase()) || normalizedTitle.includes(keyword.toLowerCase()))) {
     throw new Error(`ลิงก์ ${store.name} นี้ไม่พบสินค้าแล้ว หรือหน้าสินค้าไม่พร้อมใช้งาน`);
   }
 }
@@ -169,8 +153,7 @@ function detectPageProblem(store: StoreConfig, html: string, title: string) {
 async function fetchDocument(productUrl: string) {
   const response = await fetch(productUrl, {
     headers: {
-      "user-agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
       "accept-language": "th-TH,th;q=0.9,en;q=0.8",
     },
     cache: "no-store",
@@ -222,13 +205,7 @@ const httpHtmlScraper: ScraperAdapter = async ({ productUrl, store }) => {
       .slice(0, 10)
       .map((node) => {
         const element = $(node);
-        return (
-          element.attr("content") ||
-          element.attr("data-price") ||
-          element.attr("aria-label") ||
-          element.text() ||
-          ""
-        );
+        return element.attr("content") || element.attr("data-price") || element.attr("aria-label") || element.text() || "";
       });
 
     for (const value of values) {
@@ -252,8 +229,7 @@ const httpHtmlScraper: ScraperAdapter = async ({ productUrl, store }) => {
     throw new Error(`ไม่สามารถดึงชื่อสินค้า หรือราคาจากหน้า ${store.name} นี้ได้อย่างน่าเชื่อถือ`);
   }
 
-  const confidenceLevel =
-    bestPrice.score >= 9 ? "HIGH" : bestPrice.score >= 5 ? "MEDIUM" : bestPrice.score >= 2 ? "LOW" : "FAILED";
+  const confidenceLevel = bestPrice.score >= 9 ? "HIGH" : bestPrice.score >= 5 ? "MEDIUM" : bestPrice.score >= 2 ? "LOW" : "FAILED";
 
   const confidenceReason =
     confidenceLevel === "HIGH"

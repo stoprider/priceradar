@@ -1,10 +1,10 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { loginAction } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { getSessionUser } from "@/server/auth";
-import { redirect } from "next/navigation";
 
 export default async function LoginPage({
   searchParams,
@@ -30,7 +30,10 @@ export default async function LoginPage({
           <Button type="submit">เข้าสู่ระบบ</Button>
         </form>
         <p className="mt-5 text-sm text-[color:var(--color-ink-muted)]">
-          ยังไม่มีบัญชี? <Link href="/register" className="font-semibold text-[color:var(--color-accent)]">สมัครสมาชิก</Link>
+          ยังไม่มีบัญชี?{" "}
+          <Link href="/register" className="font-semibold text-[color:var(--color-accent)]">
+            สมัครสมาชิก
+          </Link>
         </p>
       </Card>
     </main>

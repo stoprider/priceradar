@@ -18,7 +18,11 @@ export default async function ProductsPage({
   const params = await searchParams;
 
   return (
-    <AppShell user={user} title="สินค้าที่ติดตาม" description="รวมลิงก์สินค้า ราคาเป้าหมาย ระดับดีล และความเชื่อมั่นไว้ในตารางเดียวเพื่อให้ตรวจสอบได้รวดเร็ว">
+    <AppShell
+      user={user}
+      title="สินค้าที่ติดตาม"
+      description="รวมลิงก์สินค้า ราคาเป้าหมาย ระดับดีล และความเชื่อมั่นไว้ในตารางเดียวเพื่อให้ตรวจสอบได้รวดเร็ว"
+    >
       {params.success ? <p className="mb-4 text-sm text-emerald-700">{params.success}</p> : null}
       {params.error ? <p className="mb-4 text-sm text-rose-600">{params.error}</p> : null}
       <div className="mb-5 flex justify-end">

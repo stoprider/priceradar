@@ -29,7 +29,7 @@ export default async function AdminLogsPage() {
             {logs.map((log) => (
               <tr key={log.id} className="text-sm text-[color:var(--color-ink-muted)]">
                 <td className="px-4 py-4">{log.store?.name || "-"}</td>
-                <td className="px-4 py-4">{log.success ? <Badge tone="positive">สำเร็จ</Badge> : <Badge tone="warning">คำเตือน</Badge>}</td>
+                <td className="px-4 py-4">{log.success ? <Badge tone="positive">สำเร็จ</Badge> : <Badge tone="warning">เตือน</Badge>}</td>
                 <td className="px-4 py-4">{log.message}</td>
                 <td className="px-4 py-4">{log.responseTimeMs} ms</td>
                 <td className="px-4 py-4">{new Date(log.createdAt).toLocaleString("th-TH")}</td>

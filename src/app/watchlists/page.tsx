@@ -21,7 +21,11 @@ export default async function WatchlistsPage({
   });
 
   return (
-    <AppShell user={user} title="รายการเฝ้าดู" description="จัดกลุ่มสินค้าที่ติดตามตามเป้าหมายการใช้งาน และแชร์ลิงก์แบบอ่านอย่างเดียวให้ผู้อื่นได้หากต้องการ">
+    <AppShell
+      user={user}
+      title="รายการเฝ้าดู"
+      description="จัดกลุ่มสินค้าที่ติดตามตามเป้าหมายการใช้งาน และแชร์ลิงก์แบบอ่านอย่างเดียวให้ผู้อื่นได้หากต้องการ"
+    >
       {params.success ? <p className="mb-4 text-sm text-emerald-700">{params.success}</p> : null}
       {params.error ? <p className="mb-4 text-sm text-rose-600">{params.error}</p> : null}
       <Card className="mb-6 p-6">
@@ -40,7 +44,9 @@ export default async function WatchlistsPage({
       <div className="grid gap-6 md:grid-cols-2">
         {watchlists.map((watchlist) => (
           <Card key={watchlist.id} className="p-6">
-            <div className="text-sm uppercase tracking-[0.22em] text-[color:var(--color-ink-soft)]">{watchlist.isPublic ? "เปิดแชร์สาธารณะ" : "รายการส่วนตัว"}</div>
+            <div className="text-sm uppercase tracking-[0.22em] text-[color:var(--color-ink-soft)]">
+              {watchlist.isPublic ? "เปิดแชร์สาธารณะ" : "รายการส่วนตัว"}
+            </div>
             <h2 className="mt-3 text-2xl font-semibold text-[color:var(--color-ink)]">{watchlist.name}</h2>
             <p className="mt-3 text-sm leading-6 text-[color:var(--color-ink-muted)]">{watchlist.description}</p>
             <p className="mt-2 text-sm text-[color:var(--color-ink-soft)]">{watchlist.items.length} รายการ</p>

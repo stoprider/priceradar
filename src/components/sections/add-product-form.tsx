@@ -13,9 +13,7 @@ export function AddProductForm({ error }: { error?: string }) {
       <div className="mb-5">
         <div className="text-sm uppercase tracking-[0.24em] text-[color:var(--color-ink-soft)]">ลิงก์ใหม่สำหรับติดตาม</div>
         <h3 className="mt-2 text-xl font-semibold text-[color:var(--color-ink)]">วางลิงก์สินค้าเพื่อเริ่มติดตามราคา</h3>
-        <p className="mt-3 text-sm leading-6 text-[color:var(--color-ink-soft)]">
-          รองรับใช้งานตอนนี้: {enabledStores.join(", ")}
-        </p>
+        <p className="mt-3 text-sm leading-6 text-[color:var(--color-ink-soft)]">ร้านค้าที่รองรับในตอนนี้: {enabledStores.join(", ")}</p>
       </div>
       <form action={createProductAction}>
         <div className="grid gap-4 md:grid-cols-2">
